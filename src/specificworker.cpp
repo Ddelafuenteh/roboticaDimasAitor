@@ -17,7 +17,7 @@
  *    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "specificworker.h"
-
+#include <random>
 /**
 * \brief Default constructor
 */
@@ -48,21 +48,26 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 
 void SpecificWorker::compute()
 {
-//  printf("Hola\n");
+	float umbral =250;
+	int aleat = rand() % 2000;
     TLaserData data = laser_proxy->getLaserData();
-    for (auto d:data)
-      qDebug()<< d.dist << d.angle;
-// 	try
-// 	{
-// 		camera_proxy->getYImage(0,img, cState, bState);
-// 		memcpy(image_gray.data, &img[0], m_width*m_height*sizeof(uchar));
-// 		searchTags(image_gray);
-// 	}
-// 	catch(const Ice::Exception &e)
-// 	{
-// 		std::cout << "Error reading from Camera" << e << std::endl;
-// 	}
-}
+	std::sort(data.begin()+20, data.end()-20, [](auto a, auto b){ return a.dist < b.dist;});//ordenar
+	
+	if( data[20].dist < umbral)
+	{	
+		if(aleat%10 == 1){
+			differentialrobot_proxy->setSpeedBase(10,0.5);
+			usleep(aleat);
+
+		}
+		else{
+			differentialrobot_proxy->setSpeedBase(10,-0.5);
+			usleep(aleat);
+		}
+	}
+	else
+		differentialrobot_proxy->setSpeedBase(400,0);
+}	
 
 
 
