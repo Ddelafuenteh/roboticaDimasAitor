@@ -24,10 +24,10 @@
 #include <stdint.h>
 #include <qlog/qlog.h>
 
-#include <ui_mainUI.h>
 
 #include <CommonBehavior.h>
 #include <DifferentialRobot.h>
+#include <RCISMousePicker.h>
 #include <Laser.h>
 
 
@@ -40,17 +40,14 @@ typedef map <string,::IceProxy::Ice::Object*> MapPrx;
 using namespace std;
 
 using namespace RoboCompDifferentialRobot;
+using namespace RoboCompRCISMousePicker;
 using namespace RoboCompLaser;
 
 
 
 
 class GenericWorker : 
-#ifdef USE_QTGUI
-public QWidget, public Ui_guiDlg
-#else
 public QObject
-#endif
 {
 Q_OBJECT
 public:
@@ -66,6 +63,7 @@ public:
 	DifferentialRobotPrx differentialrobot_proxy;
 	LaserPrx laser_proxy;
 
+	virtual void setPick(const Pick &myPick) = 0;
 
 
 protected:

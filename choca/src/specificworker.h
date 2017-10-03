@@ -22,17 +22,13 @@
        @author authorname
 */
 
-
-
-
-
-
-
 #ifndef SPECIFICWORKER_H
 #define SPECIFICWORKER_H
 
 #include <genericworker.h>
 #include <innermodel/innermodel.h>
+#include <pthread.h>
+
 
 class SpecificWorker : public GenericWorker
 {
@@ -41,12 +37,43 @@ public:
 	SpecificWorker(MapPrx& mprx);	
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
+	void setPick(const Pick &myPick);
 
 
 public slots:
 	void compute(); 	
 
 private:
+	InnerModel *innermodel;
+
+	struct Target{
+		
+	private:
+		float x,z;
+		Target(){};
+		
+		bool insertCoordinates(float Cx, float Cz){
+			
+			x = Cx;
+			z = Cz;		
+			return true;
+		}
+		
+		bool extractCoordinates(float &Cx, float &Cz){
+		
+			Cx = x;
+			Cz = z;
+			
+			return true;
+		}
+		
+		bool isEmptyC(){
+			
+			if (x == NULL || z == NULL)
+				return true;
+			return false;
+		}
+	};
 	
 };
 

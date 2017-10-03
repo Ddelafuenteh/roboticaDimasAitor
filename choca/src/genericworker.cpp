@@ -21,12 +21,7 @@
 * \brief Default constructor
 */
 GenericWorker::GenericWorker(MapPrx& mprx) :
-#ifdef USE_QTGUI
-Ui_guiDlg()
-#else
 QObject()
-#endif
-
 {
 	laser_proxy = (*(LaserPrx*)mprx["LaserProxy"]);
 	differentialrobot_proxy = (*(DifferentialRobotPrx*)mprx["DifferentialRobotProxy"]);
@@ -34,10 +29,6 @@ QObject()
 
 	mutex = new QMutex(QMutex::Recursive);
 
-	#ifdef USE_QTGUI
-		setupUi(this);
-		show();
-	#endif
 	Period = BASIC_PERIOD;
 	connect(&timer, SIGNAL(timeout()), this, SLOT(compute()));
 // 	timer.start(Period);

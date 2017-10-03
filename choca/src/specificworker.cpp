@@ -23,7 +23,7 @@
 */
 SpecificWorker::SpecificWorker(MapPrx& mprx) : GenericWorker(mprx)
 {
-
+	
 }
 
 /**
@@ -37,11 +37,9 @@ SpecificWorker::~SpecificWorker()
 bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 {
 
-
-
-	
+	//innermodel = new InnerModel("/home/salabeta/robocomp/files/innermodel/simpleworld.xml");
 	timer.start(Period);
-	
+
 
 	return true;
 }
@@ -53,7 +51,7 @@ void SpecificWorker::compute()
     TLaserData data = laser_proxy->getLaserData();
 	std::sort(data.begin()+20, data.end()-20, [](auto a, auto b){ return a.dist < b.dist;});//ordenar
 	
-	if( data[20].dist < umbral)
+	if( data[20].dist < umbral)            
 	{	
 		if(aleat%10 == 1){
 			differentialrobot_proxy->setSpeedBase(10,0.5);
@@ -67,7 +65,23 @@ void SpecificWorker::compute()
 	}
 	else
 		differentialrobot_proxy->setSpeedBase(400,0);
+	
+	
+	
+	
+	/*
+	 * En el compute, coger el mutex antes de escribir y leer para que no haya conflicto
+	 */
 }	
+
+
+void SpecificWorker::setPick(const Pick &myPick)
+{
+
+	qDebug()<< myPick.x << myPick.z;
+	
+	
+}
 
 
 
