@@ -23,7 +23,8 @@
 */
 SpecificWorker::SpecificWorker(MapPrx& mprx) : GenericWorker(mprx)
 {
-	
+	mutex = new QMutex(QMutex::Recursive);
+
 }
 
 /**
@@ -37,7 +38,7 @@ SpecificWorker::~SpecificWorker()
 bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 {
 
-	//innermodel = new InnerModel("/home/salabeta/robocomp/files/innermodel/simpleworld.xml");
+	innermodel = new InnerModel("/home/salabeta/robocomp/files/innermodel/simpleworld.xml");
 	timer.start(Period);
 
 
@@ -46,11 +47,54 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 
 void SpecificWorker::compute()
 {
-	float umbral =250;
+    TLaserData data = laser_proxy->getLaserData();	
+	float vAdv, vRot;
+	TBaseState state;
+	differentialrobot_proxy->getBaseState(state);
+	innermodel->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0);
+		qDebug()<< "Robot" <<state.x << state.z;
+
+	
+	if (!T.isEmptyC()){
+		std::pair<float, float> tg = T.extractCoordinates();
+		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+		float d = targetRobot.norm2();
+
+		if (d > 50){
+			vAdv = d;
+			if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
+			vRot = atan2(targetRobot.x(), targetRobot.z());
+			if(vRot > MAX_VROT) MAX_VROT = vRot;
+			qDebug()<< "Robot" <<vAdv << vRot;
+
+			differentialrobot_proxy->setSpeedBase(vAdv,vRot);
+		}
+		else{
+			differentialrobot_proxy->setSpeedBase(0,0);
+		T.setEmptyC();
+		}
+	}
+	
+	
+}	
+
+
+void SpecificWorker::setPick(const Pick &myPick)
+{
+
+	qDebug()<< myPick.x << myPick.z;
+	T.insertCoordinates(myPick.x, myPick.z);
+	
+}
+
+	/*
+	 * 
+	 * float umbral =250;
 	int aleat = rand() % 2000;
     TLaserData data = laser_proxy->getLaserData();
 	std::sort(data.begin()+20, data.end()-20, [](auto a, auto b){ return a.dist < b.dist;});//ordenar
 	
+	 * 
 	if( data[20].dist < umbral)            
 	{	
 		if(aleat%10 == 1){
@@ -66,24 +110,7 @@ void SpecificWorker::compute()
 	else
 		differentialrobot_proxy->setSpeedBase(400,0);
 	
-	
-	
-	
-	/*
-	 * En el compute, coger el mutex antes de escribir y leer para que no haya conflicto
-	 */
-}	
-
-
-void SpecificWorker::setPick(const Pick &myPick)
-{
-
-	qDebug()<< myPick.x << myPick.z;
-	
-	
-}
-
-
+	*/
 
 
 

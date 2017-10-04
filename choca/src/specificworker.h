@@ -30,6 +30,8 @@
 #include <pthread.h>
 
 
+
+
 class SpecificWorker : public GenericWorker
 {
 Q_OBJECT
@@ -39,41 +41,61 @@ public:
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
 
-
+	float MAX_ADV = 400;
+ 	float MAX_VROT = 0.6;
 public slots:
 	void compute(); 	
 
 private:
 	InnerModel *innermodel;
+		
 
 	struct Target{
 		
-	private:
+		QMutex mutex;
 		float x,z;
+		bool vacio = true;
 		Target(){};
 		
 		bool insertCoordinates(float Cx, float Cz){
 			
+			QMutexLocker ml(&mutex);
 			x = Cx;
-			z = Cz;		
+			z = Cz;	
+			vacio = false;
 			return true;
 		}
 		
-		bool extractCoordinates(float &Cx, float &Cz){
-		
-			Cx = x;
-			Cz = z;
+		std::pair<float, float> extractCoordinates(){
+			std::pair<float, float> tg;
+			QMutexLocker ml(&mutex);
+			tg.first = x;
+			tg.second = z;
 			
-			return true;
+			return tg;
 		}
 		
 		bool isEmptyC(){
+			QMutexLocker ml(&mutex);
+			return vacio;
+		}
+		
+		void setEmptyC(){
+			QMutexLocker ml(&mutex);
+			vacio = true;
+		}
+		
+		bool enDestino(float Cx, float Cz){
 			
-			if (x == NULL || z == NULL)
+			if (Cx == x && Cz == z)
 				return true;
 			return false;
 		}
+		
+
 	};
+	
+	Target T;
 	
 };
 
