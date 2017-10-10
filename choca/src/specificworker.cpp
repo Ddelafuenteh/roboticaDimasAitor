@@ -52,7 +52,7 @@ void SpecificWorker::compute()
 	TBaseState state;
 	differentialrobot_proxy->getBaseState(state);
 	innermodel->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0);
-		qDebug()<< "Robot" <<state.x << state.z;
+		//qDebug()<< "Robot" <<state.x << state.z;
 
 	
 	if (!T.isEmptyC()){
@@ -61,13 +61,18 @@ void SpecificWorker::compute()
 		float d = targetRobot.norm2();
 
 		if (d > 50){
-			vAdv = d;
-			if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
 			vRot = atan2(targetRobot.x(), targetRobot.z());
-			if(vRot > MAX_VROT) MAX_VROT = vRot;
-			qDebug()<< "Robot" <<vAdv << vRot;
-
+			if (vRot > MAX_VROT) vRot = MAX_VROT;
+			if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
+			
+			vAdv = MAX_ADV;
+			vAdv = MAX_ADV * functionF(d) * functionH(vRot, 0.9, 0.3);
+			//if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
+			
+			qDebug()<< "Robot" << vAdv << vRot;
 			differentialrobot_proxy->setSpeedBase(vAdv,vRot);
+
+			
 		}
 		else{
 			differentialrobot_proxy->setSpeedBase(0,0);
@@ -79,10 +84,24 @@ void SpecificWorker::compute()
 }	
 
 
+float SpecificWorker::functionF(float d){
+
+	return 1/(1+exp(-d))-0.5;
+	
+}
+
+float SpecificWorker::functionH(float vRot, float Vx, float h){
+
+	float l = (-pow(Vx, 2.0)/log(h));
+	
+	return exp(-pow(vRot, 2.0)/l);
+	
+}
+
 void SpecificWorker::setPick(const Pick &myPick)
 {
 
-	qDebug()<< myPick.x << myPick.z;
+	//qDebug()<< myPick.x << myPick.z;
 	T.insertCoordinates(myPick.x, myPick.z);
 	
 }

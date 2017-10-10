@@ -40,8 +40,10 @@ public:
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
+	float functionF(float d);
+	float functionH(float vRot, float Vx, float h);
 
-	float MAX_ADV = 400;
+	float MAX_ADV = 1000;
  	float MAX_VROT = 0.6;
 public slots:
 	void compute(); 	
