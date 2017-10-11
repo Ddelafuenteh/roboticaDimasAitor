@@ -30,8 +30,6 @@
 #include <pthread.h>
 
 
-
-
 class SpecificWorker : public GenericWorker
 {
 Q_OBJECT
@@ -40,17 +38,19 @@ public:
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
-	float functionF(float d);
-	float functionH(float vRot, float Vx, float h);
+
 
 	float MAX_ADV = 1000;
  	float MAX_VROT = 0.6;
+	
+	enum States{IDLE, GOTO, BUG};
+	int receivedState = States::IDLE;
+	
 public slots:
 	void compute(); 	
 
 private:
 	InnerModel *innermodel;
-		
 
 	struct Target{
 		
@@ -98,8 +98,13 @@ private:
 	};
 	
 	Target T;
+	float functionF(float d);
+	float functionH(float vRot, float Vx, float h);
+	
 	
 };
+
+
 
 #endif
 

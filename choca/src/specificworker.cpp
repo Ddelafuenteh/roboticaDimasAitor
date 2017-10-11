@@ -49,11 +49,33 @@ void SpecificWorker::compute()
 {
     TLaserData data = laser_proxy->getLaserData();	
 	float vAdv, vRot;
-	TBaseState state;
-	differentialrobot_proxy->getBaseState(state);
-	innermodel->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0);
-		//qDebug()<< "Robot" <<state.x << state.z;
-
+	TBaseState robotState;
+	differentialrobot_proxy->getBaseState(robotState);
+	innermodel->updateTransformValues("base", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
+	
+	
+	switch(receivedState){
+	
+		case States::IDLE:
+			
+			if(!T.isEmptyC())
+				receivedState = States::GOTO;
+		break;
+			
+		case States::GOTO:
+			gotoTarget();
+		break;
+		
+		case States::BUG:
+			//bug();
+		break;
+			
+			
+		
+	}
+	
+	
+	
 	
 	if (!T.isEmptyC()){
 		std::pair<float, float> tg = T.extractCoordinates();
@@ -105,6 +127,32 @@ void SpecificWorker::setPick(const Pick &myPick)
 	T.insertCoordinates(myPick.x, myPick.z);
 	
 }
+
+void SpecificWorker::gotoTarget(){
+// If ther is an obstacle ahead, then transit to BUG
+    if( obstacle == true){ //Get laser data?
+      receivedState = States::BUG;
+      return;
+   }
+    QVec rt = innermodel->transform("base", T.getPose(), "world");
+
+    float dist = rt.norm();
+
+    float ang  = atan2(rt.x(), rt.z());
+
+	
+	// If close to obstacle stop and transit to IDLE
+   if(dist < 100){
+    receivedState = States::IDLE;
+    T.setActive(true);
+	return;
+	}
+
+	float adv = dist;
+	if ( fabs(rot) > 0.05 )
+		adv = 0;
+
+ }
 
 	/*
 	 * 
