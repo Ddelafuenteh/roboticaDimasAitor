@@ -38,12 +38,17 @@ public:
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
+	void gotoTarget(TBaseState robotState);
+	void rotate();
+	void border();
+	void obstacle(); 
+	void targetAtSight();
 
-
+	int side; //1 = Derecha, 0 = Izquierda
 	float MAX_ADV = 1000;
  	float MAX_VROT = 0.6;
 	
-	enum States{IDLE, GOTO, BUG};
+	enum States{IDLE, GOTO, ROTATE, BORDER};
 	int receivedState = States::IDLE;
 	
 public slots:

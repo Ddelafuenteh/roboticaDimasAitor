@@ -48,34 +48,38 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 void SpecificWorker::compute()
 {
     TLaserData data = laser_proxy->getLaserData();	
-	float vAdv, vRot;
 	TBaseState robotState;
 	differentialrobot_proxy->getBaseState(robotState);
 	innermodel->updateTransformValues("base", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
 	
-	
+	float speed = 0;
 	switch(receivedState){
 	
 		case States::IDLE:
 			
 			if(!T.isEmptyC())
 				receivedState = States::GOTO;
-		break;
+			break;
 			
 		case States::GOTO:
-			gotoTarget();
-		break;
+			gotoTarget(robotState);
+			break;
+			
 		
-		case States::BUG:
-			//bug();
-		break;
+		case States::ROTATE:
+			rotate();
+			break;
+			
+		case States::BORDER:
+			border();
+			break;
 			
 			
 		
 	}
 	
 	
-	
+	/*
 	
 	if (!T.isEmptyC()){
 		std::pair<float, float> tg = T.extractCoordinates();
@@ -101,21 +105,20 @@ void SpecificWorker::compute()
 		T.setEmptyC();
 		}
 	}
-	
-	
+	*/
 }	
 
-
+//Funcion Gaussiana
 float SpecificWorker::functionF(float d){
 
 	return 1/(1+exp(-d))-0.5;
 	
 }
 
+//Funcion Sinusoidal
 float SpecificWorker::functionH(float vRot, float Vx, float h){
 
 	float l = (-pow(Vx, 2.0)/log(h));
-	
 	return exp(-pow(vRot, 2.0)/l);
 	
 }
@@ -128,31 +131,100 @@ void SpecificWorker::setPick(const Pick &myPick)
 	
 }
 
-void SpecificWorker::gotoTarget(){
-// If ther is an obstacle ahead, then transit to BUG
-    if( obstacle == true){ //Get laser data?
-      receivedState = States::BUG;
-      return;
-   }
-    QVec rt = innermodel->transform("base", T.getPose(), "world");
+void SpecificWorker::gotoTarget(TBaseState robotState){
+	
+	float vAdv, vRot;
 
-    float dist = rt.norm();
-
-    float ang  = atan2(rt.x(), rt.z());
+		float distance, speed;
+		std::pair<float, float> tg = T.extractCoordinates();
+		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+		float dist = targetRobot.norm2();
+		
+		if (dist < 50){
+			T.setEmptyC(); //En Destino
+			differentialrobot_proxy->setSpeedBase(0,0);
+			receivedState = States::IDLE;
+			return;
+		}
+		if(obstacle == true){
+			receivedState = States::ROTATE;
+			differentialrobot_proxy->setSpeedBase(0,0);
+			return;
+		}
+			
+		vRot = atan2(targetRobot.x(), targetRobot.z());
+		if (vRot > MAX_VROT) vRot = MAX_VROT;
+		if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
+		
+		vAdv = MAX_ADV;
+		vAdv = MAX_ADV * functionF(dist) * functionH(vRot, 0.9, 0.3); //Gaussiana & Sinusoidal
+		//if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
+		differentialrobot_proxy->setSpeedBase(vAdv,vRot);
+}
+ 
+void SpecificWorker::rotate(){
+	
+	float umbral =250;
+	TLaserData data = laser_proxy->getLaserData();
+	
+	if (data[data.size()/2].dist > 250){
+		receivedState = States::BORDER;
+		return;
+	}	
+	
+	differentialrobot_proxy->setSpeedBase(0,0.25);
 
 	
-	// If close to obstacle stop and transit to IDLE
-   if(dist < 100){
-    receivedState = States::IDLE;
-    T.setActive(true);
-	return;
+	/*
+	 * MEJORAR
+	if (data[20].angle < 0){
+		side = 0; //Izquierda
 	}
+	else {
+		side = 1; //Derecha
+	}
+	*/
+	
 
-	float adv = dist;
-	if ( fabs(rot) > 0.05 )
-		adv = 0;
+}
 
- }
+void SpecificWorker::border(){
+	
+	//Target a la vista
+	//En Target
+	//Si est´as en la recta perpendicular al target -> GO TO
+	/*
+	QPolygonF polygon;
+for (auto l, lasercopy)
+{
+   QVec lr = innermodel->laserTo("world", "laser", l.dist, l.angle)
+   polygon << QPointF(lr.x(), lr.z());
+}
+QVec t = target.getPose();
+return  polygon.contains( QPointF(t.x(), t.z() ) ) 
+*/
+	
+	//data del 10-15 (12) -- si es > dist, si es < dist,
+	
+	
+}
+
+bool SpecificWorker::obstacle(){
+	
+	float umbral = 250;
+	TLaserData data = laser_proxy->getLaserData();
+	std::sort(data.begin()+20, data.end()-20, [](auto a, auto b){ return a.dist < b.dist;});
+	
+		return true;
+
+	return false;
+	if (data[20].dist < umbral)
+
+}
+
+bool SpecificWorker::targetAtSight(){
+
+}
 
 	/*
 	 * 
