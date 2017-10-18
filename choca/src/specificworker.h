@@ -38,11 +38,15 @@ public:
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
-	void gotoTarget(TBaseState robotState);
+	void gotoTarget( );
 	void rotate();
 	void border();
-	void obstacle(); 
-	void targetAtSight();
+	void stopRobot();
+
+	bool obstacle();
+	bool targetAtSight();
+	bool isPerpendicular();
+	bool onTarget();
 
 	int side; //1 = Derecha, 0 = Izquierda
 	float MAX_ADV = 1000;
@@ -56,6 +60,8 @@ public slots:
 
 private:
 	InnerModel *innermodel;
+	float initRobotX;
+	float initRobotZ;
 
 	struct Target{
 		

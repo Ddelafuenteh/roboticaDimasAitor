@@ -52,30 +52,32 @@ void SpecificWorker::compute()
 	differentialrobot_proxy->getBaseState(robotState);
 	innermodel->updateTransformValues("base", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
 	
-	float speed = 0;
 	switch(receivedState){
 	
 		case States::IDLE:
 			
+			qDebug()<< "IDLE" ;
 			if(!T.isEmptyC())
 				receivedState = States::GOTO;
 			break;
 			
 		case States::GOTO:
-			gotoTarget(robotState);
+			qDebug()<< "GOTO" ;
+			gotoTarget();
 			break;
 			
 		
 		case States::ROTATE:
+			qDebug()<< "ROTATE" ;
+
 			rotate();
 			break;
 			
 		case States::BORDER:
+			qDebug()<< "BORDER" ;
+
 			border();
-			break;
-			
-			
-		
+			break;	
 	}
 	
 	
@@ -127,31 +129,43 @@ void SpecificWorker::setPick(const Pick &myPick)
 {
 
 	//qDebug()<< myPick.x << myPick.z;
+	TBaseState robotState;
+	differentialrobot_proxy->getBaseState(robotState);
+	
+	initRobotX = robotState.x;
+	initRobotZ = robotState.z;
+	
 	T.insertCoordinates(myPick.x, myPick.z);
+	differentialrobot_proxy->setSpeedBase(0.0,0.0);
+	receivedState = States::IDLE;
+
+	
 	
 }
 
-void SpecificWorker::gotoTarget(TBaseState robotState){
+void SpecificWorker::gotoTarget( ){
 	
-	float vAdv, vRot;
-
-		float distance, speed;
+		float vAdv, vRot;
+		float dist;
 		std::pair<float, float> tg = T.extractCoordinates();
 		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
-		float dist = targetRobot.norm2();
+		dist = targetRobot.norm2();
+		
 		
 		if (dist < 50){
-			T.setEmptyC(); //En Destino
-			differentialrobot_proxy->setSpeedBase(0,0);
-			receivedState = States::IDLE;
+			stopRobot();
 			return;
 		}
-		if(obstacle == true){
+		
+		if(obstacle() == true){
 			receivedState = States::ROTATE;
-			differentialrobot_proxy->setSpeedBase(0,0);
+			differentialrobot_proxy->setSpeedBase(0.0,0.0);
+			qDebug()<< "ROTATE";
 			return;
 		}
-			
+		
+
+
 		vRot = atan2(targetRobot.x(), targetRobot.z());
 		if (vRot > MAX_VROT) vRot = MAX_VROT;
 		if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
@@ -160,19 +174,24 @@ void SpecificWorker::gotoTarget(TBaseState robotState){
 		vAdv = MAX_ADV * functionF(dist) * functionH(vRot, 0.9, 0.3); //Gaussiana & Sinusoidal
 		//if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
 		differentialrobot_proxy->setSpeedBase(vAdv,vRot);
+		
+
 }
  
 void SpecificWorker::rotate(){
 	
-	float umbral =250;
+	float umbral = 300;
 	TLaserData data = laser_proxy->getLaserData();
 	
-	if (data[data.size()/2].dist > 250){
+	if (abs(data[data.size()/2 + 10].dist) > umbral && abs(data[data.size()/2 - 10].dist) > umbral){
+			// differentialrobot_proxy->setSpeedBase(0.0,0.0);
 		receivedState = States::BORDER;
+		differentialrobot_proxy->setSpeedBase(0.0,0.0);
+
 		return;
 	}	
 	
-	differentialrobot_proxy->setSpeedBase(0,0.25);
+	differentialrobot_proxy->setSpeedBase(0.0,0.25);
 
 	
 	/*
@@ -190,19 +209,30 @@ void SpecificWorker::rotate(){
 
 void SpecificWorker::border(){
 	
-	//Target a la vista
+	
 	//En Target
-	//Si est´as en la recta perpendicular al target -> GO TO
+	if (onTarget()){
+		stopRobot();
+		return;
+	}
+	
+	//Target a la vista
+	if (targetAtSight() == true){
+		receivedState = States::GOTO;
+		qDebug()<< "-----------------------VISTO----------------------";
+		return;
+	}
+
 	/*
-	QPolygonF polygon;
-for (auto l, lasercopy)
-{
-   QVec lr = innermodel->laserTo("world", "laser", l.dist, l.angle)
-   polygon << QPointF(lr.x(), lr.z());
-}
-QVec t = target.getPose();
-return  polygon.contains( QPointF(t.x(), t.z() ) ) 
-*/
+	//Robot en Recta
+	if (isPerpedicular()){
+		receivedState = States::GOTO;
+		differentialrobot_proxy->setSpeedBase(0.0,0.0);
+		
+		return;
+
+	}
+	*/
 	
 	//data del 10-15 (12) -- si es > dist, si es < dist,
 	
@@ -215,15 +245,52 @@ bool SpecificWorker::obstacle(){
 	TLaserData data = laser_proxy->getLaserData();
 	std::sort(data.begin()+20, data.end()-20, [](auto a, auto b){ return a.dist < b.dist;});
 	
-		return true;
-
-	return false;
 	if (data[20].dist < umbral)
+		return true; 
+		
+	return false;
 
 }
 
 bool SpecificWorker::targetAtSight(){
+	
+	QPolygonF polygon;
+	TLaserData lasercopy = laser_proxy->getLaserData();
 
+	for (auto l: lasercopy){
+		QVec lr = innermodel->laserTo("world", "laser", l.dist, l.angle);
+		polygon << QPointF(lr.x(), lr.z());
+	}
+	QVec lr = innermodel->laserTo("world", "laser", lasercopy[0].dist, lasercopy[0].angle);
+	polygon << QPointF(lr.x(), lr.z());
+	std::pair<float, float> tg = T.extractCoordinates();
+	return  polygon.containsPoint(QPointF(tg.first, tg.second), Qt::WindingFill);
+	
+}
+
+bool SpecificWorker::onTarget(){
+	
+		std::pair<float, float> tg = T.extractCoordinates();
+		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+		float dist = targetRobot.norm2();
+		
+		if (dist < 50)
+			return true;
+		return false;
+}
+
+bool SpecificWorker::isPerpendicular(){
+	
+	
+	return true;
+}
+
+
+void SpecificWorker::stopRobot(){
+	
+	differentialrobot_proxy->setSpeedBase(0.0,0.0);
+	T.setEmptyC(); //En Destino
+	receivedState = States::IDLE;
 }
 
 	/*
