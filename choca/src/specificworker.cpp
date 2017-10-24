@@ -180,7 +180,7 @@ void SpecificWorker::gotoTarget( ){
  
 void SpecificWorker::rotate(){
 	
-	float umbral = 300;
+	float umbral = 400;
 	TLaserData data = laser_proxy->getLaserData();
 	
 	if (abs(data[data.size()/2 + 10].dist) > umbral && abs(data[data.size()/2 - 10].dist) > umbral){
@@ -191,25 +191,28 @@ void SpecificWorker::rotate(){
 		return;
 	}	
 	
-	differentialrobot_proxy->setSpeedBase(0.0,0.25);
 
-	
-	/*
-	 * MEJORAR
-	if (data[20].angle < 0){
+	if (data[10].angle < 0){
 		side = 0; //Izquierda
+		differentialrobot_proxy->setSpeedBase(0.0, 0.25);
+
 	}
 	else {
 		side = 1; //Derecha
+		differentialrobot_proxy->setSpeedBase(0.0, -0.25);
+
 	}
-	*/
+	
 	
 
 }
 
 void SpecificWorker::border(){
 	
+	TBaseState robotState;
+	differentialrobot_proxy->getBaseState(robotState);
 	
+	/*
 	//En Target
 	if (onTarget()){
 		stopRobot();
@@ -223,20 +226,39 @@ void SpecificWorker::border(){
 		return;
 	}
 
-	/*
 	//Robot en Recta
-	if (isPerpedicular()){
+	if (isPerpendicular(robotState.x, robotState.z)){
 		receivedState = States::GOTO;
-		differentialrobot_proxy->setSpeedBase(0.0,0.0);
-		
+		differentialrobot_proxy->setSpeedBase(0.0,0.0);	
 		return;
-
 	}
 	*/
 	
 	//data del 10-15 (12) -- si es > dist, si es < dist,
+	TLaserData data = laser_proxy->getLaserData();
+	auto init = data.size()/2;
+	std::sort(data.begin()+init, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
+	//differentialrobot_proxy->setSpeedBase(50, 0.0);
 	
+	if (side == 1) { //IZQUIERDA
+		qDebug()<< "IZQUIERDA";
+		std::sort(data.begin()+init, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
+			if (data[50].dist < 250)
+				differentialrobot_proxy->setSpeedBase(25, 0.3);
+			else if (data[50].dist > 350)
+				differentialrobot_proxy->setSpeedBase(25, -0.3);
+
+	}else{ //DERECHA
+		qDebug()<< "DERECHA";
+		std::sort(data.begin()+10, data.end()-init, [](auto a, auto b){ return a.dist < b.dist;});
+		if (data[10].dist < 250)
+			differentialrobot_proxy->setSpeedBase(25, -0.3);
+		else if (data[10].dist > 350)
+				differentialrobot_proxy->setSpeedBase(25, 0.3);
+	}
 	
+	differentialrobot_proxy->setSpeedBase(100, 0.0);
+
 }
 
 bool SpecificWorker::obstacle(){
@@ -279,10 +301,15 @@ bool SpecificWorker::onTarget(){
 		return false;
 }
 
-bool SpecificWorker::isPerpendicular(){
+bool SpecificWorker::isPerpendicular(float X, float Z){
+	
+	float value = T.z*(X - initRobotZ) - initRobotZ*X - Z*(T.x - initRobotX) + initRobotZ*T.x;
+	
+	if (value <= 10)
+		return true;
 	
 	
-	return true;
+	return false;
 }
 
 

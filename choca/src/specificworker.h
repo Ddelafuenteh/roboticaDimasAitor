@@ -45,7 +45,7 @@ public:
 
 	bool obstacle();
 	bool targetAtSight();
-	bool isPerpendicular();
+	bool isPerpendicular(float X, float Z);
 	bool onTarget();
 
 	int side; //1 = Derecha, 0 = Izquierda
