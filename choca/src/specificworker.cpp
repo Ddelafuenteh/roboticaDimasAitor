@@ -73,6 +73,12 @@ void SpecificWorker::compute()
 			rotate();
 			break;
 			
+		case States::ENTERINGBORDER:
+			qDebug()<< "ENTERINGBORDER" ;
+
+			enteringborder();   //no estar sobre la rect
+			break;		
+			
 		case States::BORDER:
 			qDebug()<< "BORDER" ;
 
@@ -183,7 +189,7 @@ void SpecificWorker::rotate(){
 	float umbral = 400;
 	TLaserData data = laser_proxy->getLaserData();
 	
-	if (abs(data[data.size()/2 + 10].dist) > umbral && abs(data[data.size()/2 - 10].dist) > umbral){
+	if (abs(data[data.size()/2 + 20].dist) > umbral && abs(data[data.size()/2 - 20].dist) > umbral){
 			// differentialrobot_proxy->setSpeedBase(0.0,0.0);
 		receivedState = States::BORDER;
 		differentialrobot_proxy->setSpeedBase(0.0,0.0);
@@ -192,14 +198,18 @@ void SpecificWorker::rotate(){
 	}	
 	
 
-	if (data[10].angle < 0){
+	std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
+
+	if (data[12].angle >= 0){
 		side = 0; //Izquierda
-		differentialrobot_proxy->setSpeedBase(0.0, 0.25);
+		qDebug()<< "izquierda";
+		differentialrobot_proxy->setSpeedBase(0.0, -0.25);
 
 	}
 	else {
+		qDebug()<< "derecha";
 		side = 1; //Derecha
-		differentialrobot_proxy->setSpeedBase(0.0, -0.25);
+		differentialrobot_proxy->setSpeedBase(0.0, 0.25);
 
 	}
 	
@@ -207,58 +217,65 @@ void SpecificWorker::rotate(){
 
 }
 
-void SpecificWorker::border(){
+void SpecificWorker::border()
+{	
+	QVec robotInWorld = innermodel->transform("world","base");
 	
-	TBaseState robotState;
-	differentialrobot_proxy->getBaseState(robotState);
-	
+	std::pair<float, float> tg = T.extractCoordinates();
+	QVec targetEnRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+	float dist = targetEnRobot.norm2();
+		
+		
+		if (dist < 200){
+			stopRobot();
+			return;
+		}
 	/*
-	//En Target
-	if (onTarget()){
-		stopRobot();
-		return;
-	}
-	
 	//Target a la vista
 	if (targetAtSight() == true){
 		receivedState = States::GOTO;
-		qDebug()<< "-----------------------VISTO----------------------";
 		return;
 	}
 
+	*/
 	//Robot en Recta
-	if (isPerpendicular(robotState.x, robotState.z)){
+	if (isPerpendicular(robotInWorld.x(), robotInWorld.z()))
+	{
 		receivedState = States::GOTO;
 		differentialrobot_proxy->setSpeedBase(0.0,0.0);	
 		return;
 	}
-	*/
+	
 	
 	//data del 10-15 (12) -- si es > dist, si es < dist,
 	TLaserData data = laser_proxy->getLaserData();
 	auto init = data.size()/2;
-	std::sort(data.begin()+init, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
 	//differentialrobot_proxy->setSpeedBase(50, 0.0);
 	
-	if (side == 1) { //IZQUIERDA
-		qDebug()<< "IZQUIERDA";
-		std::sort(data.begin()+init, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
-			if (data[50].dist < 250)
+	if (side == 0) { //IZQUIERDA
+		std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
+			if (data[10].dist < 250)
 				differentialrobot_proxy->setSpeedBase(25, 0.3);
-			else if (data[50].dist > 350)
+			else if (data[10].dist > 350){
 				differentialrobot_proxy->setSpeedBase(25, -0.3);
+			}	else 	differentialrobot_proxy->setSpeedBase(100, 0.0);
+
 
 	}else{ //DERECHA
-		qDebug()<< "DERECHA";
-		std::sort(data.begin()+10, data.end()-init, [](auto a, auto b){ return a.dist < b.dist;});
+		std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
 		if (data[10].dist < 250)
 			differentialrobot_proxy->setSpeedBase(25, -0.3);
-		else if (data[10].dist > 350)
+		else if (data[10].dist > 350){
 				differentialrobot_proxy->setSpeedBase(25, 0.3);
+		}	else differentialrobot_proxy->setSpeedBase(100, 0.0);
+
 	}
 	
-	differentialrobot_proxy->setSpeedBase(100, 0.0);
-
+	
+	//crear un estado nuevo para que cuando el robot este en la recta la primera vez tenga que entrar en el hasta bordee y salga de ella, cuando salga 
+	//se ira al estado border normal que sera el que continue, asi la primera vez detecta que esta en la recta pero tiene que salir por que tiene que bordear
+	
+	
 }
 
 bool SpecificWorker::obstacle(){
@@ -303,8 +320,18 @@ bool SpecificWorker::onTarget(){
 
 bool SpecificWorker::isPerpendicular(float X, float Z){
 	
-	float value = T.z*(X - initRobotZ) - initRobotZ*X - Z*(T.x - initRobotX) + initRobotZ*T.x;
+	float value = 0;//abs(X*(T.z - initRobotZ) - Z*(T.x - initRobotX) - (T.z*initRobotX) + (T.x*initRobotZ));
 	
+	float A = T.z - initRobotZ;
+	float B = T.x - initRobotX;
+	float C = - (B*initRobotZ) - (A*initRobotX);
+	
+	value = abs(A*X + B*Z + C);
+	
+	
+	value = value / sqrt(pow(A, 2.0) + pow(B, 2.0));
+	
+	qDebug()<<value;
 	if (value <= 10)
 		return true;
 	
