@@ -358,9 +358,9 @@ bool SpecificWorker::isPerpendicular(float X, float Z){
 	float A, B, C;
 	 A = B = C = 0.0;
 	
-	 A = abs(T.z - initRobotZ);
-	 B = abs(T.x - initRobotX);
-	 C = (-(B*initRobotZ) - (A*initRobotX));
+	 A = initRobotZ - T.z;
+	 B = initRobotX - T.x;
+	 C = (-B*initRobotZ) - (A*initRobotX);
 	
 	float value = 0.0;
 	value = abs(A*X + B*Z + C);
@@ -372,6 +372,8 @@ bool SpecificWorker::isPerpendicular(float X, float Z){
 	
 	
 	return false;
+	
+
 }
 
 
