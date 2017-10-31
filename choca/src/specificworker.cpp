@@ -73,10 +73,10 @@ void SpecificWorker::compute()
 			rotate();
 			break;
 			
-		case States::ENTERINGBORDER:
-			qDebug()<< "ENTERINGBORDER" ;
+		case States::BORDERINIT:
+			qDebug()<< "BORDERINIT" ;
 
-			enteringborder();   //no estar sobre la rect
+			borderinit();   //no estar sobre la rect
 			break;		
 			
 		case States::BORDER:
@@ -158,7 +158,7 @@ void SpecificWorker::gotoTarget( ){
 		dist = targetRobot.norm2();
 		
 		
-		if (dist < 50){
+		if (dist < 200){
 			stopRobot();
 			return;
 		}
@@ -177,7 +177,7 @@ void SpecificWorker::gotoTarget( ){
 		if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
 		
 		vAdv = MAX_ADV;
-		vAdv = MAX_ADV * functionF(dist) * functionH(vRot, 0.9, 0.3); //Gaussiana & Sinusoidal
+		vAdv = MAX_ADV * functionF(dist) * functionH(vRot, 0.3, 0.3); //Gaussiana & Sinusoidal
 		//if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
 		differentialrobot_proxy->setSpeedBase(vAdv,vRot);
 		
@@ -191,7 +191,7 @@ void SpecificWorker::rotate(){
 	
 	if (abs(data[data.size()/2 + 20].dist) > umbral && abs(data[data.size()/2 - 20].dist) > umbral){
 			// differentialrobot_proxy->setSpeedBase(0.0,0.0);
-		receivedState = States::BORDER;
+		receivedState = States::BORDERINIT;
 		differentialrobot_proxy->setSpeedBase(0.0,0.0);
 
 		return;
@@ -200,16 +200,16 @@ void SpecificWorker::rotate(){
 
 	std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
 
-	if (data[12].angle >= 0){
+	if (data[10].angle >= 0){
 		side = 0; //Izquierda
 		qDebug()<< "izquierda";
-		differentialrobot_proxy->setSpeedBase(0.0, -0.25);
+		differentialrobot_proxy->setSpeedBase(0.0, -0.30);
 
 	}
 	else {
 		qDebug()<< "derecha";
 		side = 1; //Derecha
-		differentialrobot_proxy->setSpeedBase(0.0, 0.25);
+		differentialrobot_proxy->setSpeedBase(0.0, 0.30);
 
 	}
 	
@@ -217,10 +217,29 @@ void SpecificWorker::rotate(){
 
 }
 
-void SpecificWorker::border()
-{	
+void SpecificWorker::borderinit()
+{
 	QVec robotInWorld = innermodel->transform("world","base");
 	
+	std::pair<float, float> tg = T.extractCoordinates();
+	QVec targetEnRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+	//float dist = targetEnRobot.norm2();
+		
+		//Robot en Recta
+	if (!isPerpendicular(robotInWorld.x(), robotInWorld.z()))
+	{
+		receivedState = States::BORDER;
+		differentialrobot_proxy->setSpeedBase(0.0,0.0);	
+		return;
+	}
+	
+	bug();
+
+}
+
+
+void SpecificWorker::border()
+{		
 	std::pair<float, float> tg = T.extractCoordinates();
 	QVec targetEnRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
 	float dist = targetEnRobot.norm2();
@@ -230,14 +249,16 @@ void SpecificWorker::border()
 			stopRobot();
 			return;
 		}
-	/*
+	
 	//Target a la vista
 	if (targetAtSight() == true){
 		receivedState = States::GOTO;
+		qDebug()<< "AT SIGHT";
 		return;
 	}
 
-	*/
+	QVec robotInWorld = innermodel->transform("world","base");
+
 	//Robot en Recta
 	if (isPerpendicular(robotInWorld.x(), robotInWorld.z()))
 	{
@@ -247,35 +268,40 @@ void SpecificWorker::border()
 	}
 	
 	
-	//data del 10-15 (12) -- si es > dist, si es < dist,
-	TLaserData data = laser_proxy->getLaserData();
-	auto init = data.size()/2;
-	//differentialrobot_proxy->setSpeedBase(50, 0.0);
-	
-	if (side == 0) { //IZQUIERDA
-		std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
-			if (data[10].dist < 250)
-				differentialrobot_proxy->setSpeedBase(25, 0.3);
-			else if (data[10].dist > 350){
-				differentialrobot_proxy->setSpeedBase(25, -0.3);
-			}	else 	differentialrobot_proxy->setSpeedBase(100, 0.0);
-
-
-	}else{ //DERECHA
-		std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
-		if (data[10].dist < 250)
-			differentialrobot_proxy->setSpeedBase(25, -0.3);
-		else if (data[10].dist > 350){
-				differentialrobot_proxy->setSpeedBase(25, 0.3);
-		}	else differentialrobot_proxy->setSpeedBase(100, 0.0);
-
-	}
+	bug();
 	
 	
 	//crear un estado nuevo para que cuando el robot este en la recta la primera vez tenga que entrar en el hasta bordee y salga de ella, cuando salga 
 	//se ira al estado border normal que sera el que continue, asi la primera vez detecta que esta en la recta pero tiene que salir por que tiene que bordear
 	
 	
+}
+
+void SpecificWorker::bug(){
+	
+		//data del 10-15 (12) -- si es > dist, si es < dist,
+	TLaserData data = laser_proxy->getLaserData();
+	//auto init = data.size()/2;
+	//differentialrobot_proxy->setSpeedBase(50, 0.0);
+	
+	if (side == 1) { //IZQUIERDA?
+		std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
+			if (data[10].dist < 280)
+				differentialrobot_proxy->setSpeedBase(25, 0.3);
+			else if (data[10].dist > 380){
+				differentialrobot_proxy->setSpeedBase(25, -0.3);
+			}	else 	differentialrobot_proxy->setSpeedBase(100, 0.0);
+
+
+	}else{ //DERECHA
+		std::sort(data.begin()+10, data.end()-10, [](auto a, auto b){ return a.dist < b.dist;});
+		if (data[10].dist < 280)
+			differentialrobot_proxy->setSpeedBase(25, -0.3);
+		else if (data[10].dist > 380){
+				differentialrobot_proxy->setSpeedBase(25, 0.3);
+		}	else differentialrobot_proxy->setSpeedBase(100, 0.0);
+
+	}
 }
 
 bool SpecificWorker::obstacle(){
@@ -295,15 +321,24 @@ bool SpecificWorker::targetAtSight(){
 	
 	QPolygonF polygon;
 	TLaserData lasercopy = laser_proxy->getLaserData();
+	
 
-	for (auto l: lasercopy){
-		QVec lr = innermodel->laserTo("world", "laser", l.dist, l.angle);
+	if (!obstacle()){
+		for (auto l: lasercopy){
+			QVec lr = innermodel->laserTo("world", "laser", l.dist, l.angle);
+			polygon << QPointF(lr.x(), lr.z());
+		}
+		QVec lr = innermodel->laserTo("world", "laser", lasercopy[0].dist, lasercopy[0].angle);
 		polygon << QPointF(lr.x(), lr.z());
+		
+		QVec robotInWorld = innermodel->transform("world","base");
+
+		polygon << QPointF(robotInWorld.x(), robotInWorld.z());
+		std::pair<float, float> tg = T.extractCoordinates();
+		return  polygon.containsPoint(QPointF(tg.first, tg.second), Qt::WindingFill);
 	}
-	QVec lr = innermodel->laserTo("world", "laser", lasercopy[0].dist, lasercopy[0].angle);
-	polygon << QPointF(lr.x(), lr.z());
-	std::pair<float, float> tg = T.extractCoordinates();
-	return  polygon.containsPoint(QPointF(tg.first, tg.second), Qt::WindingFill);
+	else
+		return false;
 	
 }
 
@@ -313,26 +348,26 @@ bool SpecificWorker::onTarget(){
 		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
 		float dist = targetRobot.norm2();
 		
-		if (dist < 50)
+		if (dist < 200)
 			return true;
 		return false;
 }
 
 bool SpecificWorker::isPerpendicular(float X, float Z){
 	
-	float value = 0;//abs(X*(T.z - initRobotZ) - Z*(T.x - initRobotX) - (T.z*initRobotX) + (T.x*initRobotZ));
+	float A, B, C;
+	 A = B = C = 0.0;
 	
-	float A = T.z - initRobotZ;
-	float B = T.x - initRobotX;
-	float C = - (B*initRobotZ) - (A*initRobotX);
+	 A = abs(T.z - initRobotZ);
+	 B = abs(T.x - initRobotX);
+	 C = (-(B*initRobotZ) - (A*initRobotX));
 	
+	float value = 0.0;
 	value = abs(A*X + B*Z + C);
-	
-	
-	value = value / sqrt(pow(A, 2.0) + pow(B, 2.0));
+	value = (value / sqrt(pow(A, 2.0) + pow(B, 2.0)));
 	
 	qDebug()<<value;
-	if (value <= 10)
+	if (value <= 100)
 		return true;
 	
 	

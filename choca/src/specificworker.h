@@ -41,7 +41,9 @@ public:
 	void gotoTarget( );
 	void rotate();
 	void border();
+	void borderinit();
 	void stopRobot();
+	void bug();
 
 	bool obstacle();
 	bool targetAtSight();
@@ -52,7 +54,7 @@ public:
 	float MAX_ADV = 1000;
  	float MAX_VROT = 0.6;
 	
-	enum States{IDLE, GOTO, ROTATE, BORDER};
+	enum States{IDLE, GOTO, ROTATE, BORDERINIT,BORDER};
 	int receivedState = States::IDLE;
 	
 public slots:
