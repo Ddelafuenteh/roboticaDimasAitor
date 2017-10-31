@@ -223,10 +223,14 @@ void SpecificWorker::borderinit()
 	
 	std::pair<float, float> tg = T.extractCoordinates();
 	QVec targetEnRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
-	//float dist = targetEnRobot.norm2();
-		
+	float dist = targetEnRobot.norm2();
+
+	if (dist < 200){
+		stopRobot();
+		return;
+		}
 		//Robot en Recta
-	if (!isPerpendicular(robotInWorld.x(), robotInWorld.z()))
+	if (!isAligned(robotInWorld.x(), robotInWorld.z()))
 	{
 		receivedState = States::BORDER;
 		differentialrobot_proxy->setSpeedBase(0.0,0.0);	
@@ -260,7 +264,7 @@ void SpecificWorker::border()
 	QVec robotInWorld = innermodel->transform("world","base");
 
 	//Robot en Recta
-	if (isPerpendicular(robotInWorld.x(), robotInWorld.z()))
+	if (isAligned(robotInWorld.x(), robotInWorld.z()))
 	{
 		receivedState = States::GOTO;
 		differentialrobot_proxy->setSpeedBase(0.0,0.0);	
@@ -353,21 +357,27 @@ bool SpecificWorker::onTarget(){
 		return false;
 }
 
-bool SpecificWorker::isPerpendicular(float X, float Z){
+bool SpecificWorker::isAligned(float X, float Z){
+	
+		float value = 0.0;
+
+	
 	
 	float A, B, C;
 	 A = B = C = 0.0;
 	
-	 A = initRobotZ - T.z;
-	 B = initRobotX - T.x;
-	 C = (-B*initRobotZ) - (A*initRobotX);
+	 A = T.z - initRobotZ;
+	 B = T.x - initRobotX;
+	 //C = (-B*initRobotZ) - (A*initRobotX);
 	
-	float value = 0.0;
-	value = abs(A*X + B*Z + C);
+	//value = abs(A*X + B*Z + C);
+	//value = (value / sqrt(pow(A, 2.0) + pow(B, 2.0)));
+	
+	value = abs((A*(X-initRobotX)) - (B*(Z-initRobotZ)));
 	value = (value / sqrt(pow(A, 2.0) + pow(B, 2.0)));
-	
+
 	qDebug()<<value;
-	if (value <= 100)
+	if (value <= 200)
 		return true;
 	
 	
