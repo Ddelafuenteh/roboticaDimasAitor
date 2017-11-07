@@ -116,20 +116,7 @@ void SpecificWorker::compute()
 	*/
 }	
 
-//Funcion Gaussiana
-float SpecificWorker::functionF(float d){
 
-	return 1/(1+exp(-d))-0.5;
-	
-}
-
-//Funcion Sinusoidal
-float SpecificWorker::functionH(float vRot, float Vx, float h){
-
-	float l = (-pow(Vx, 2.0)/log(h));
-	return exp(-pow(vRot, 2.0)/l);
-	
-}
 
 void SpecificWorker::setPick(const Pick &myPick)
 {
@@ -144,12 +131,25 @@ void SpecificWorker::setPick(const Pick &myPick)
 	T.insertCoordinates(myPick.x, myPick.z);
 	differentialrobot_proxy->setSpeedBase(0.0,0.0);
 	receivedState = States::IDLE;
+}
 
-	
+
+//Funcion Gaussiana
+float SpecificWorker::gaussian(float d){
+
+	return 1/(1+exp(-d))-0.5;
 	
 }
 
-void SpecificWorker::gotoTarget( ){
+//Funcion Sinusoidal
+float SpecificWorker::sinusoidal(float vRot, float Vx, float h){
+
+	float l = (-pow(Vx, 2.0)/log(h));
+	return exp(-pow(vRot, 2.0)/l);
+	
+}
+
+void SpecificWorker::gotoTarget(){
 	
 		float vAdv, vRot;
 		float dist;
@@ -177,7 +177,7 @@ void SpecificWorker::gotoTarget( ){
 		if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
 		
 		vAdv = MAX_ADV;
-		vAdv = MAX_ADV * functionF(dist) * functionH(vRot, 0.3, 0.3); //Gaussiana & Sinusoidal
+		vAdv = MAX_ADV * gaussian(dist) * sinusoidal(vRot, 0.3, 0.3); //Gaussiana & Sinusoidal
 		//if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
 		differentialrobot_proxy->setSpeedBase(vAdv,vRot);
 		
@@ -253,13 +253,14 @@ void SpecificWorker::border()
 			stopRobot();
 			return;
 		}
-	
+	/*
 	//Target a la vista
 	if (targetAtSight() == true){
 		receivedState = States::GOTO;
 		qDebug()<< "AT SIGHT";
 		return;
 	}
+	*/
 
 	QVec robotInWorld = innermodel->transform("world","base");
 
@@ -320,6 +321,13 @@ bool SpecificWorker::obstacle(){
 	return false;
 
 }
+
+/*
+ * 
+ * OPCION: Guardar un estado antes de mandar al robot a GOTO desde AtSight, ya que
+ * hace los ultimos metros a cachos. Quizas comprobar con el laser para que no haya nada
+ * alrededor en X radio.
+ */
 
 bool SpecificWorker::targetAtSight(){
 	
@@ -393,6 +401,37 @@ void SpecificWorker::stopRobot(){
 	T.setEmptyC(); //En Destino
 	receivedState = States::IDLE;
 }
+
+void SpecificWorker::go(const string &nodo, const float x, const float y, const float alpha){
+	
+	TBaseState robotState;
+	differentialrobot_proxy->getBaseState(robotState);
+	
+	initRobotX = robotState.x;
+	initRobotZ = robotState.z;
+	
+	T.insertCoordinates(x, y);
+	differentialrobot_proxy->setSpeedBase(0.0,0.0);
+	receivedState = States::IDLE;
+	
+	//gotoTarget(x, y);
+	
+};
+
+void SpecificWorker::turn(const float speed){
+	
+	differentialrobot_proxy->setSpeedBase(0.0,speed);
+
+};
+
+bool SpecificWorker::atTarget(){
+	return onTarget();
+};
+
+void SpecificWorker::stop(){
+	stopRobot();
+};
+
 
 	/*
 	 * 

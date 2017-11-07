@@ -38,6 +38,7 @@ public:
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
+
 	void gotoTarget( );
 	void rotate();
 	void border();
@@ -49,6 +50,14 @@ public:
 	bool targetAtSight();
 	bool isAligned(float X, float Z);
 	bool onTarget();
+	
+	 void go(const string &nodo, const float x, const float y, const float alpha);
+	 void turn(const float speed);
+	 bool atTarget();
+	 void stop();
+	//virtual void setPick(const Pick &myPick) = 0;
+	
+	
 
 	int side; //1 = Derecha, 0 = Izquierda
 	float MAX_ADV = 1000;
@@ -111,8 +120,8 @@ private:
 	};
 	
 	Target T;
-	float functionF(float d);
-	float functionH(float vRot, float Vx, float h);
+	float gaussian(float d);
+	float sinusoidal(float vRot, float Vx, float h);
 	
 	
 };
