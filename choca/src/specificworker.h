@@ -48,6 +48,7 @@ public:
 
 	bool obstacle();
 	bool targetAtSight();
+	bool inAngle();
 	bool isAligned(float X, float Z);
 	bool onTarget();
 	

@@ -129,6 +129,8 @@ void SpecificWorker::setPick(const Pick &myPick)
 	initRobotZ = robotState.z;
 	
 	T.insertCoordinates(myPick.x, myPick.z);
+	qDebug()<<myPick.x;
+	qDebug()<< myPick.z;
 	differentialrobot_proxy->setSpeedBase(0.0,0.0);
 	receivedState = States::IDLE;
 }
@@ -177,7 +179,7 @@ void SpecificWorker::gotoTarget(){
 		if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
 		
 		vAdv = MAX_ADV;
-		vAdv = MAX_ADV * gaussian(dist) * sinusoidal(vRot, 0.3, 0.3); //Gaussiana & Sinusoidal
+		vAdv = MAX_ADV * gaussian(dist) * sinusoidal(vRot, 0.3, 0.4); //Gaussiana & Sinusoidal
 		//if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
 		differentialrobot_proxy->setSpeedBase(vAdv,vRot);
 		
@@ -228,7 +230,8 @@ void SpecificWorker::borderinit()
 	if (dist < 200){
 		stopRobot();
 		return;
-		}
+	}
+	
 		//Robot en Recta
 	if (!isAligned(robotInWorld.x(), robotInWorld.z()))
 	{
@@ -253,14 +256,16 @@ void SpecificWorker::border()
 			stopRobot();
 			return;
 		}
-	/*
+	
 	//Target a la vista
-	if (targetAtSight() == true){
+	if (targetAtSight() == true && inAngle()){
 		receivedState = States::GOTO;
 		qDebug()<< "AT SIGHT";
 		return;
 	}
-	*/
+	
+	
+	
 
 	QVec robotInWorld = innermodel->transform("world","base");
 
@@ -313,9 +318,9 @@ bool SpecificWorker::obstacle(){
 	
 	float umbral = 250;
 	TLaserData data = laser_proxy->getLaserData();
-	std::sort(data.begin()+20, data.end()-20, [](auto a, auto b){ return a.dist < b.dist;});
+	std::sort(data.begin()+30, data.end()-30, [](auto a, auto b){ return a.dist < b.dist;});
 	
-	if (data[20].dist < umbral)
+	if (data[30].dist < umbral)
 		return true; 
 		
 	return false;
@@ -354,13 +359,31 @@ bool SpecificWorker::targetAtSight(){
 	
 }
 
+bool SpecificWorker::inAngle(){
+
+	std::pair<float, float> tg = T.extractCoordinates();
+	QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+	
+	TBaseState robotState;
+	differentialrobot_proxy->getBaseState(robotState);
+	
+	float angle = atan2(targetRobot.x()-robotState.x, targetRobot.z()-robotState.z);
+	qDebug()<< "ANGULO" << angle;
+	
+	return (abs(angle) > 0.5 && abs(angle) < 1.2);
+	
+
+	
+	
+}
+
 bool SpecificWorker::onTarget(){
 	
 		std::pair<float, float> tg = T.extractCoordinates();
 		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
 		float dist = targetRobot.norm2();
 		
-		if (dist < 200)
+		if (dist < 500)
 			return true;
 		return false;
 }
@@ -385,7 +408,7 @@ bool SpecificWorker::isAligned(float X, float Z){
 	value = (value / sqrt(pow(A, 2.0) + pow(B, 2.0)));
 
 	qDebug()<<value;
-	if (value <= 200)
+	if (value <= 150)
 		return true;
 	
 	
