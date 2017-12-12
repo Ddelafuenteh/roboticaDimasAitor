@@ -1,0 +1,14 @@
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/CMakeFiles/install.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/CMakeFiles/list_install_components.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/CMakeFiles/install/strip.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/CMakeFiles/install/local.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/CMakeFiles/rebuild_cache.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/CMakeFiles/edit_cache.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/install.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/list_install_components.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/rebuild_cache.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/supervisor.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/install/local.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/install/strip.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/edit_cache.dir
+/home/salabeta/robocomp/components/roboticaDimasAitor/supervisor/src/CMakeFiles/supervisor_automoc.dir

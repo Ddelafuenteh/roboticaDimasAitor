@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "componente_automoc.cpp"
+  "CommonBehavior.cpp"
+  "CommonBehavior.h"
+  "Laser.cpp"
+  "Laser.h"
+  "DifferentialRobot.cpp"
+  "DifferentialRobot.h"
+  "RCISMousePicker.cpp"
+  "RCISMousePicker.h"
+  "GotoPoint.cpp"
+  "GotoPoint.h"
+  "JointMotor.cpp"
+  "JointMotor.h"
+  "AprilTags.cpp"
+  "AprilTags.h"
+  "CMakeFiles/componente.dir/specificworker.cpp.o"
+  "CMakeFiles/componente.dir/specificmonitor.cpp.o"
+  "CMakeFiles/componente.dir/home/salabeta/robocomp/classes/rapplication/rapplication.cpp.o"
+  "CMakeFiles/componente.dir/home/salabeta/robocomp/classes/qlog/qlog.cpp.o"
+  "CMakeFiles/componente.dir/main.cpp.o"
+  "CMakeFiles/componente.dir/genericmonitor.cpp.o"
+  "CMakeFiles/componente.dir/commonbehaviorI.cpp.o"
+  "CMakeFiles/componente.dir/genericworker.cpp.o"
+  "CMakeFiles/componente.dir/gotopointI.cpp.o"
+  "CMakeFiles/componente.dir/rcismousepickerI.cpp.o"
+  "CMakeFiles/componente.dir/apriltagsI.cpp.o"
+  "CMakeFiles/componente.dir/CommonBehavior.cpp.o"
+  "CMakeFiles/componente.dir/Laser.cpp.o"
+  "CMakeFiles/componente.dir/DifferentialRobot.cpp.o"
+  "CMakeFiles/componente.dir/RCISMousePicker.cpp.o"
+  "CMakeFiles/componente.dir/GotoPoint.cpp.o"
+  "CMakeFiles/componente.dir/JointMotor.cpp.o"
+  "CMakeFiles/componente.dir/AprilTags.cpp.o"
+  "CMakeFiles/componente.dir/componente_automoc.cpp.o"
+  "../bin/componente.pdb"
+  "../bin/componente"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/componente.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

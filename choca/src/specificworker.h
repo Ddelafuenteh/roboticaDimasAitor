@@ -38,6 +38,8 @@ public:
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
+		void newAprilTag(const tagsList &tags);
+
 
 	void gotoTarget( );
 	void rotate();
@@ -45,13 +47,17 @@ public:
 	void borderinit();
 	void stopRobot();
 	void bug();
+	void catchTheBox();
 
+	//CHECK STATE METHODS
 	bool obstacle();
 	bool targetAtSight();
 	bool inAngle();
 	bool isAligned(float X, float Z);
 	bool onTarget();
+// 	bool BoxLocated();
 	
+	//VIRTUAL METHODS
 	 void go(const string &nodo, const float x, const float y, const float alpha);
 	 void turn(const float speed);
 	 bool atTarget();
@@ -64,7 +70,7 @@ public:
 	float MAX_ADV = 1000;
  	float MAX_VROT = 0.6;
 	
-	enum States{IDLE, GOTO, ROTATE, BORDERINIT,BORDER};
+	enum States{IDLE, GOTO, ROTATE, BORDERINIT, BORDER, PICK, REALEASING};
 	int receivedState = States::IDLE;
 	
 public slots:
@@ -74,6 +80,10 @@ private:
 	InnerModel *innermodel;
 	float initRobotX;
 	float initRobotZ;
+	
+	string flag;
+	bool onBox = false;
+	
 
 	struct Target{
 		

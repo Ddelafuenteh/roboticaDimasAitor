@@ -1,4 +1,4 @@
-/*
+            /*
  *    Copyright (C) 2017 by YOUR NAME HERE
  *
  *    This file is part of RoboComp
@@ -37,8 +37,14 @@ SpecificWorker::~SpecificWorker()
 
 bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 {
+	
+	/*
+	 * wrist_right = 1,20
+	 * elbow_right = 1,50
+	 * shoulder_right_2 = -1.2
+	 */
 
-	innermodel = new InnerModel("/home/salabeta/robocomp/files/innermodel/simpleworld.xml");
+	innermodel = new InnerModel("/home/salabeta/robocomp/files/innermodel/betaWorldArm.xml");
 	timer.start(Period);
 
 
@@ -50,7 +56,7 @@ void SpecificWorker::compute()
     TLaserData data = laser_proxy->getLaserData();	
 	TBaseState robotState;
 	differentialrobot_proxy->getBaseState(robotState);
-	innermodel->updateTransformValues("base", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
+	innermodel->updateTransformValues("robot", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
 	
 	switch(receivedState){
 	
@@ -68,7 +74,7 @@ void SpecificWorker::compute()
 			
 		
 		case States::ROTATE:
-			qDebug()<< "ROTATE" ;
+			qDebug()<< "ROTATE" ; // cuando ve un obstaculo
 
 			rotate();
 			break;
@@ -80,40 +86,15 @@ void SpecificWorker::compute()
 			break;		
 			
 		case States::BORDER:
-			qDebug()<< "BORDER" ;
+			qDebug()<< "BORDER" ; // comienza a bordear el obstaculo 
 
 			border();
 			break;	
+			
+		case States::PICK:
+			break;
 	}
 	
-	
-	/*
-	
-	if (!T.isEmptyC()){
-		std::pair<float, float> tg = T.extractCoordinates();
-		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
-		float d = targetRobot.norm2();
-
-		if (d > 50){
-			vRot = atan2(targetRobot.x(), targetRobot.z());
-			if (vRot > MAX_VROT) vRot = MAX_VROT;
-			if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
-			
-			vAdv = MAX_ADV;
-			vAdv = MAX_ADV * functionF(d) * functionH(vRot, 0.9, 0.3);
-			//if (vAdv > MAX_ADV) MAX_ADV = vAdv; 
-			
-			qDebug()<< "Robot" << vAdv << vRot;
-			differentialrobot_proxy->setSpeedBase(vAdv,vRot);
-
-			
-		}
-		else{
-			differentialrobot_proxy->setSpeedBase(0,0);
-		T.setEmptyC();
-		}
-	}
-	*/
 }	
 
 
@@ -156,7 +137,7 @@ void SpecificWorker::gotoTarget(){
 		float vAdv, vRot;
 		float dist;
 		std::pair<float, float> tg = T.extractCoordinates();
-		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+		QVec targetRobot = innermodel->transform("robot",QVec::vec3(tg.first, 0, tg.second) , "world");
 		dist = targetRobot.norm2();
 		
 		
@@ -221,10 +202,10 @@ void SpecificWorker::rotate(){
 
 void SpecificWorker::borderinit()
 {
-	QVec robotInWorld = innermodel->transform("world","base");
+	QVec robotInWorld = innermodel->transform("world","robot");
 	
 	std::pair<float, float> tg = T.extractCoordinates();
-	QVec targetEnRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+	QVec targetEnRobot = innermodel->transform("robot",QVec::vec3(tg.first, 0, tg.second) , "world");
 	float dist = targetEnRobot.norm2();
 
 	if (dist < 200){
@@ -248,7 +229,7 @@ void SpecificWorker::borderinit()
 void SpecificWorker::border()
 {		
 	std::pair<float, float> tg = T.extractCoordinates();
-	QVec targetEnRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+	QVec targetEnRobot = innermodel->transform("robot",QVec::vec3(tg.first, 0, tg.second) , "world");
 	float dist = targetEnRobot.norm2();
 		
 		
@@ -267,7 +248,7 @@ void SpecificWorker::border()
 	
 	
 
-	QVec robotInWorld = innermodel->transform("world","base");
+	QVec robotInWorld = innermodel->transform("world","robot");
 
 	//Robot en Recta
 	if (isAligned(robotInWorld.x(), robotInWorld.z()))
@@ -348,7 +329,7 @@ bool SpecificWorker::targetAtSight(){
 		QVec lr = innermodel->laserTo("world", "laser", lasercopy[0].dist, lasercopy[0].angle);
 		polygon << QPointF(lr.x(), lr.z());
 		
-		QVec robotInWorld = innermodel->transform("world","base");
+		QVec robotInWorld = innermodel->transform("world","robot");
 
 		polygon << QPointF(robotInWorld.x(), robotInWorld.z());
 		std::pair<float, float> tg = T.extractCoordinates();
@@ -362,7 +343,7 @@ bool SpecificWorker::targetAtSight(){
 bool SpecificWorker::inAngle(){
 
 	std::pair<float, float> tg = T.extractCoordinates();
-	QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+	QVec targetRobot = innermodel->transform("robot",QVec::vec3(tg.first, 0, tg.second) , "world");
 	
 	TBaseState robotState;
 	differentialrobot_proxy->getBaseState(robotState);
@@ -380,11 +361,16 @@ bool SpecificWorker::inAngle(){
 bool SpecificWorker::onTarget(){
 	
 		std::pair<float, float> tg = T.extractCoordinates();
-		QVec targetRobot = innermodel->transform("base",QVec::vec3(tg.first, 0, tg.second) , "world");
+		QVec targetRobot = innermodel->transform("robot",QVec::vec3(tg.first, 0, tg.second) , "world");
 		float dist = targetRobot.norm2();
-		
-		if (dist < 500)
+		float limit = 700;
+				
+		if (onBox)
 			return true;
+			
+		
+		//if (dist < limit)
+		//	return true;
 		return false;
 }
 
@@ -417,6 +403,18 @@ bool SpecificWorker::isAligned(float X, float Z){
 
 }
 
+// void SpecificWorker::boxLocated(){
+// 	
+// 		std::pair<float, float> tg = T.extractCoordinates();
+// 		QVec targetRobot = innermodel->transform("robot",QVec::vec3(tg.first, 0, tg.second) , "world");
+// 		float dist = targetRobot.norm2();
+// 		
+// 		if (dist < 700)
+// 			return true;
+// 		return false;
+// 
+// 	
+// };
 
 void SpecificWorker::stopRobot(){
 	
@@ -425,6 +423,9 @@ void SpecificWorker::stopRobot(){
 	receivedState = States::IDLE;
 }
 
+
+//**************************** VIRTUAL METHODS ***********************************************
+
 void SpecificWorker::go(const string &nodo, const float x, const float y, const float alpha){
 	
 	TBaseState robotState;
@@ -432,6 +433,8 @@ void SpecificWorker::go(const string &nodo, const float x, const float y, const 
 	
 	initRobotX = robotState.x;
 	initRobotZ = robotState.z;
+	
+	flag = nodo;
 	
 	T.insertCoordinates(x, y);
 	differentialrobot_proxy->setSpeedBase(0.0,0.0);
@@ -456,32 +459,44 @@ void SpecificWorker::stop(){
 };
 
 
-	/*
-	 * 
-	 * float umbral =250;
-	int aleat = rand() % 2000;
-    TLaserData data = laser_proxy->getLaserData();
-	std::sort(data.begin()+20, data.end()-20, [](auto a, auto b){ return a.dist < b.dist;});//ordenar
-	
-	 * 
-	if( data[20].dist < umbral)            
-	{	
-		if(aleat%10 == 1){
-			differentialrobot_proxy->setSpeedBase(10,0.5);
-			usleep(aleat);
 
-		}
-		else{
-			differentialrobot_proxy->setSpeedBase(10,-0.5);
-			usleep(aleat);
-		}
+void SpecificWorker::catchTheBox(){
+
+	
+};
+
+void SpecificWorker::newAprilTag(const tagsList &tags)
+{
+	for (unsigned int i = 0; i < tags.size(); i++)
+		qDebug()<< "TAG" << tags[i].id;
+	if (tags[0].id > 9){
+		onBox = true;
+		stopRobot();
 	}
-	else
-		differentialrobot_proxy->setSpeedBase(400,0);
 	
-	*/
+	
+// 	QVec robotInWorld = innermodel->transform("world","robot");
+	
+// 	int tag;
+// 	if (!boxPicked){
+// 		tag = getMinTag(tags, 0);
+// 		if (tag != -1){ //If box found
+// 			QVec targetRobot = innermodel->transform("world",QVec::vec3(tags[tag].tx, 0, tags[tag].tz) , "rgbd");
+// 			T.insertTag(currentBox, targetRobot.x(), targetRobot.z());
+// 		}
+// 
+// 	}
+// 	else{
+// 		tag = getTag(tags, currentTag);
+// 		if ( tag != -1){
+// 				QVec targetRobot = innermodel->transform("world",QVec::vec3(tags[tag].tx, 0, tags[tag].tz) , "rgbd");
+// 				T.insertTag(tags[tag].id, targetRobot.x(), targetRobot.z());
+// 		}
+// 
+// 	}
+	
 
 
-
-
+	
+}
 
