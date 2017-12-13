@@ -41,10 +41,10 @@ public:
 	SpecificWorker(MapPrx& mprx);	
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
-	void newAprilTag(const tagsList &tags);
-	
-	int getTag(const tagsList tags, int t);
-	int getMinTag(const tagsList tags, int flag);
+
+	void getMarcas();
+	int getTag(int t);
+	int getMinTag(int flag);
 	
 	
 
@@ -55,6 +55,7 @@ private:
 	QMutex mutex;
 	InnerModel *innermodel;
 	
+	
 	float initRobotX, initRobotZ;
 	
 	int currentTag = 0;
@@ -64,7 +65,7 @@ private:
 	bool boxPicked = false;
 	
 
-	enum States{SEARCHBOX, INIT, WAIT,RESTART, FINISH};
+	enum States{SEARCHBOX, INIT, WAIT,GOHOME, FINISH};
 	int receivedState = States::SEARCHBOX;
 	
 		struct Tag{
@@ -122,7 +123,10 @@ private:
 		}
 		*/
 		};
+		
 		Tag T;
+		RoboCompGetAprilTags::listaMarcas listaMarcas;
+
 
 	
 };

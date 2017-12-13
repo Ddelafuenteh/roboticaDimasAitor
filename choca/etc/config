@@ -6,14 +6,14 @@ GotoPoint.Endpoints=tcp -p 10095
 
 # Endpoints for subscriptions
 RCISMousePickerTopic.Endpoints=tcp -p 15000
-AprilTagsTopic.Endpoints=tcp -p 14311
+GetAprilTagsProxy = getapriltags:tcp -h localhost -p 14311
 
 
 
 # Proxies for required interfaces
 DifferentialRobotProxy = differentialrobot:tcp -h localhost -p 10004
 LaserProxy = laser:tcp -h localhost -p 10003
-JointMotorProxy = jointmotor:tcp -h localhost -p 10010
+JointMotorProxy = jointmotor:tcp -h localhost -p 20000
 
 
 

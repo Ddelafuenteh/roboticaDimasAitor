@@ -184,33 +184,6 @@ componente_automoc/fast:
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente_automoc.dir/build.make src/CMakeFiles/componente_automoc.dir/build
 .PHONY : componente_automoc/fast
 
-AprilTags.o: AprilTags.cpp.o
-
-.PHONY : AprilTags.o
-
-# target to build an object file
-AprilTags.cpp.o:
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/AprilTags.cpp.o
-.PHONY : AprilTags.cpp.o
-
-AprilTags.i: AprilTags.cpp.i
-
-.PHONY : AprilTags.i
-
-# target to preprocess a source file
-AprilTags.cpp.i:
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/AprilTags.cpp.i
-.PHONY : AprilTags.cpp.i
-
-AprilTags.s: AprilTags.cpp.s
-
-.PHONY : AprilTags.s
-
-# target to generate assembly for a file
-AprilTags.cpp.s:
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/AprilTags.cpp.s
-.PHONY : AprilTags.cpp.s
-
 CommonBehavior.o: CommonBehavior.cpp.o
 
 .PHONY : CommonBehavior.o
@@ -264,6 +237,33 @@ DifferentialRobot.s: DifferentialRobot.cpp.s
 DifferentialRobot.cpp.s:
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/DifferentialRobot.cpp.s
 .PHONY : DifferentialRobot.cpp.s
+
+GetAprilTags.o: GetAprilTags.cpp.o
+
+.PHONY : GetAprilTags.o
+
+# target to build an object file
+GetAprilTags.cpp.o:
+	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/GetAprilTags.cpp.o
+.PHONY : GetAprilTags.cpp.o
+
+GetAprilTags.i: GetAprilTags.cpp.i
+
+.PHONY : GetAprilTags.i
+
+# target to preprocess a source file
+GetAprilTags.cpp.i:
+	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/GetAprilTags.cpp.i
+.PHONY : GetAprilTags.cpp.i
+
+GetAprilTags.s: GetAprilTags.cpp.s
+
+.PHONY : GetAprilTags.s
+
+# target to generate assembly for a file
+GetAprilTags.cpp.s:
+	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/GetAprilTags.cpp.s
+.PHONY : GetAprilTags.cpp.s
 
 GotoPoint.o: GotoPoint.cpp.o
 
@@ -372,33 +372,6 @@ RCISMousePicker.s: RCISMousePicker.cpp.s
 RCISMousePicker.cpp.s:
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/RCISMousePicker.cpp.s
 .PHONY : RCISMousePicker.cpp.s
-
-apriltagsI.o: apriltagsI.cpp.o
-
-.PHONY : apriltagsI.o
-
-# target to build an object file
-apriltagsI.cpp.o:
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/apriltagsI.cpp.o
-.PHONY : apriltagsI.cpp.o
-
-apriltagsI.i: apriltagsI.cpp.i
-
-.PHONY : apriltagsI.i
-
-# target to preprocess a source file
-apriltagsI.cpp.i:
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/apriltagsI.cpp.i
-.PHONY : apriltagsI.cpp.i
-
-apriltagsI.s: apriltagsI.cpp.s
-
-.PHONY : apriltagsI.s
-
-# target to generate assembly for a file
-apriltagsI.cpp.s:
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/apriltagsI.cpp.s
-.PHONY : apriltagsI.cpp.s
 
 commonbehaviorI.o: commonbehaviorI.cpp.o
 
@@ -711,15 +684,15 @@ help:
 	@echo "... install/strip"
 	@echo "... edit_cache"
 	@echo "... componente_automoc"
-	@echo "... AprilTags.o"
-	@echo "... AprilTags.i"
-	@echo "... AprilTags.s"
 	@echo "... CommonBehavior.o"
 	@echo "... CommonBehavior.i"
 	@echo "... CommonBehavior.s"
 	@echo "... DifferentialRobot.o"
 	@echo "... DifferentialRobot.i"
 	@echo "... DifferentialRobot.s"
+	@echo "... GetAprilTags.o"
+	@echo "... GetAprilTags.i"
+	@echo "... GetAprilTags.s"
 	@echo "... GotoPoint.o"
 	@echo "... GotoPoint.i"
 	@echo "... GotoPoint.s"
@@ -732,9 +705,6 @@ help:
 	@echo "... RCISMousePicker.o"
 	@echo "... RCISMousePicker.i"
 	@echo "... RCISMousePicker.s"
-	@echo "... apriltagsI.o"
-	@echo "... apriltagsI.i"
-	@echo "... apriltagsI.s"
 	@echo "... commonbehaviorI.o"
 	@echo "... commonbehaviorI.i"
 	@echo "... commonbehaviorI.s"

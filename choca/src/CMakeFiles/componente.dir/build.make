@@ -99,12 +99,12 @@ src/JointMotor.cpp: /opt/robocomp/interfaces/JointMotor.ice
 src/JointMotor.h: src/JointMotor.cpp
 	@$(CMAKE_COMMAND) -E touch_nocreate src/JointMotor.h
 
-src/AprilTags.cpp: /opt/robocomp/interfaces/AprilTags.ice
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Generating AprilTags.cpp and AprilTags.h from AprilTags.ice"
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && slice2cpp -I/home/salabeta/robocomp//interfaces/ -I/opt/robocomp/interfaces -I. /opt/robocomp/interfaces/AprilTags.ice --output-dir .
+src/GetAprilTags.cpp: /opt/robocomp/interfaces/GetAprilTags.ice
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Generating GetAprilTags.cpp and GetAprilTags.h from GetAprilTags.ice"
+	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && slice2cpp -I/home/salabeta/robocomp//interfaces/ -I/opt/robocomp/interfaces -I. /opt/robocomp/interfaces/GetAprilTags.ice --output-dir .
 
-src/AprilTags.h: src/AprilTags.cpp
-	@$(CMAKE_COMMAND) -E touch_nocreate src/AprilTags.h
+src/GetAprilTags.h: src/GetAprilTags.cpp
+	@$(CMAKE_COMMAND) -E touch_nocreate src/GetAprilTags.h
 
 src/CMakeFiles/componente.dir/specificworker.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/specificworker.cpp.o: src/specificworker.cpp
@@ -346,33 +346,9 @@ src/CMakeFiles/componente.dir/rcismousepickerI.cpp.o.provides: src/CMakeFiles/co
 src/CMakeFiles/componente.dir/rcismousepickerI.cpp.o.provides.build: src/CMakeFiles/componente.dir/rcismousepickerI.cpp.o
 
 
-src/CMakeFiles/componente.dir/apriltagsI.cpp.o: src/CMakeFiles/componente.dir/flags.make
-src/CMakeFiles/componente.dir/apriltagsI.cpp.o: src/apriltagsI.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object src/CMakeFiles/componente.dir/apriltagsI.cpp.o"
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/apriltagsI.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/apriltagsI.cpp
-
-src/CMakeFiles/componente.dir/apriltagsI.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/componente.dir/apriltagsI.cpp.i"
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/apriltagsI.cpp > CMakeFiles/componente.dir/apriltagsI.cpp.i
-
-src/CMakeFiles/componente.dir/apriltagsI.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/componente.dir/apriltagsI.cpp.s"
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/apriltagsI.cpp -o CMakeFiles/componente.dir/apriltagsI.cpp.s
-
-src/CMakeFiles/componente.dir/apriltagsI.cpp.o.requires:
-
-.PHONY : src/CMakeFiles/componente.dir/apriltagsI.cpp.o.requires
-
-src/CMakeFiles/componente.dir/apriltagsI.cpp.o.provides: src/CMakeFiles/componente.dir/apriltagsI.cpp.o.requires
-	$(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/apriltagsI.cpp.o.provides.build
-.PHONY : src/CMakeFiles/componente.dir/apriltagsI.cpp.o.provides
-
-src/CMakeFiles/componente.dir/apriltagsI.cpp.o.provides.build: src/CMakeFiles/componente.dir/apriltagsI.cpp.o
-
-
 src/CMakeFiles/componente.dir/CommonBehavior.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/CommonBehavior.cpp.o: src/CommonBehavior.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object src/CMakeFiles/componente.dir/CommonBehavior.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object src/CMakeFiles/componente.dir/CommonBehavior.cpp.o"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/CommonBehavior.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/CommonBehavior.cpp
 
 src/CMakeFiles/componente.dir/CommonBehavior.cpp.i: cmake_force
@@ -396,7 +372,7 @@ src/CMakeFiles/componente.dir/CommonBehavior.cpp.o.provides.build: src/CMakeFile
 
 src/CMakeFiles/componente.dir/Laser.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/Laser.cpp.o: src/Laser.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object src/CMakeFiles/componente.dir/Laser.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object src/CMakeFiles/componente.dir/Laser.cpp.o"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/Laser.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/Laser.cpp
 
 src/CMakeFiles/componente.dir/Laser.cpp.i: cmake_force
@@ -420,7 +396,7 @@ src/CMakeFiles/componente.dir/Laser.cpp.o.provides.build: src/CMakeFiles/compone
 
 src/CMakeFiles/componente.dir/DifferentialRobot.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/DifferentialRobot.cpp.o: src/DifferentialRobot.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object src/CMakeFiles/componente.dir/DifferentialRobot.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object src/CMakeFiles/componente.dir/DifferentialRobot.cpp.o"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/DifferentialRobot.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/DifferentialRobot.cpp
 
 src/CMakeFiles/componente.dir/DifferentialRobot.cpp.i: cmake_force
@@ -444,7 +420,7 @@ src/CMakeFiles/componente.dir/DifferentialRobot.cpp.o.provides.build: src/CMakeF
 
 src/CMakeFiles/componente.dir/RCISMousePicker.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/RCISMousePicker.cpp.o: src/RCISMousePicker.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object src/CMakeFiles/componente.dir/RCISMousePicker.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object src/CMakeFiles/componente.dir/RCISMousePicker.cpp.o"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/RCISMousePicker.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/RCISMousePicker.cpp
 
 src/CMakeFiles/componente.dir/RCISMousePicker.cpp.i: cmake_force
@@ -468,7 +444,7 @@ src/CMakeFiles/componente.dir/RCISMousePicker.cpp.o.provides.build: src/CMakeFil
 
 src/CMakeFiles/componente.dir/GotoPoint.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/GotoPoint.cpp.o: src/GotoPoint.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object src/CMakeFiles/componente.dir/GotoPoint.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object src/CMakeFiles/componente.dir/GotoPoint.cpp.o"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/GotoPoint.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/GotoPoint.cpp
 
 src/CMakeFiles/componente.dir/GotoPoint.cpp.i: cmake_force
@@ -492,7 +468,7 @@ src/CMakeFiles/componente.dir/GotoPoint.cpp.o.provides.build: src/CMakeFiles/com
 
 src/CMakeFiles/componente.dir/JointMotor.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/JointMotor.cpp.o: src/JointMotor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object src/CMakeFiles/componente.dir/JointMotor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object src/CMakeFiles/componente.dir/JointMotor.cpp.o"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/JointMotor.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/JointMotor.cpp
 
 src/CMakeFiles/componente.dir/JointMotor.cpp.i: cmake_force
@@ -514,33 +490,33 @@ src/CMakeFiles/componente.dir/JointMotor.cpp.o.provides: src/CMakeFiles/componen
 src/CMakeFiles/componente.dir/JointMotor.cpp.o.provides.build: src/CMakeFiles/componente.dir/JointMotor.cpp.o
 
 
-src/CMakeFiles/componente.dir/AprilTags.cpp.o: src/CMakeFiles/componente.dir/flags.make
-src/CMakeFiles/componente.dir/AprilTags.cpp.o: src/AprilTags.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object src/CMakeFiles/componente.dir/AprilTags.cpp.o"
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/AprilTags.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/AprilTags.cpp
+src/CMakeFiles/componente.dir/GetAprilTags.cpp.o: src/CMakeFiles/componente.dir/flags.make
+src/CMakeFiles/componente.dir/GetAprilTags.cpp.o: src/GetAprilTags.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object src/CMakeFiles/componente.dir/GetAprilTags.cpp.o"
+	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/GetAprilTags.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/GetAprilTags.cpp
 
-src/CMakeFiles/componente.dir/AprilTags.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/componente.dir/AprilTags.cpp.i"
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/AprilTags.cpp > CMakeFiles/componente.dir/AprilTags.cpp.i
+src/CMakeFiles/componente.dir/GetAprilTags.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/componente.dir/GetAprilTags.cpp.i"
+	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/GetAprilTags.cpp > CMakeFiles/componente.dir/GetAprilTags.cpp.i
 
-src/CMakeFiles/componente.dir/AprilTags.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/componente.dir/AprilTags.cpp.s"
-	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/AprilTags.cpp -o CMakeFiles/componente.dir/AprilTags.cpp.s
+src/CMakeFiles/componente.dir/GetAprilTags.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/componente.dir/GetAprilTags.cpp.s"
+	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/GetAprilTags.cpp -o CMakeFiles/componente.dir/GetAprilTags.cpp.s
 
-src/CMakeFiles/componente.dir/AprilTags.cpp.o.requires:
+src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.requires:
 
-.PHONY : src/CMakeFiles/componente.dir/AprilTags.cpp.o.requires
+.PHONY : src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.requires
 
-src/CMakeFiles/componente.dir/AprilTags.cpp.o.provides: src/CMakeFiles/componente.dir/AprilTags.cpp.o.requires
-	$(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/AprilTags.cpp.o.provides.build
-.PHONY : src/CMakeFiles/componente.dir/AprilTags.cpp.o.provides
+src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.provides: src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/componente.dir/build.make src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.provides.build
+.PHONY : src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.provides
 
-src/CMakeFiles/componente.dir/AprilTags.cpp.o.provides.build: src/CMakeFiles/componente.dir/AprilTags.cpp.o
+src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.provides.build: src/CMakeFiles/componente.dir/GetAprilTags.cpp.o
 
 
 src/CMakeFiles/componente.dir/componente_automoc.cpp.o: src/CMakeFiles/componente.dir/flags.make
 src/CMakeFiles/componente.dir/componente_automoc.cpp.o: src/componente_automoc.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object src/CMakeFiles/componente.dir/componente_automoc.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object src/CMakeFiles/componente.dir/componente_automoc.cpp.o"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/componente.dir/componente_automoc.cpp.o -c /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/componente_automoc.cpp
 
 src/CMakeFiles/componente.dir/componente_automoc.cpp.i: cmake_force
@@ -574,14 +550,13 @@ componente_OBJECTS = \
 "CMakeFiles/componente.dir/genericworker.cpp.o" \
 "CMakeFiles/componente.dir/gotopointI.cpp.o" \
 "CMakeFiles/componente.dir/rcismousepickerI.cpp.o" \
-"CMakeFiles/componente.dir/apriltagsI.cpp.o" \
 "CMakeFiles/componente.dir/CommonBehavior.cpp.o" \
 "CMakeFiles/componente.dir/Laser.cpp.o" \
 "CMakeFiles/componente.dir/DifferentialRobot.cpp.o" \
 "CMakeFiles/componente.dir/RCISMousePicker.cpp.o" \
 "CMakeFiles/componente.dir/GotoPoint.cpp.o" \
 "CMakeFiles/componente.dir/JointMotor.cpp.o" \
-"CMakeFiles/componente.dir/AprilTags.cpp.o" \
+"CMakeFiles/componente.dir/GetAprilTags.cpp.o" \
 "CMakeFiles/componente.dir/componente_automoc.cpp.o"
 
 # External object files for target componente
@@ -597,14 +572,13 @@ bin/componente: src/CMakeFiles/componente.dir/commonbehaviorI.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/genericworker.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/gotopointI.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/rcismousepickerI.cpp.o
-bin/componente: src/CMakeFiles/componente.dir/apriltagsI.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/CommonBehavior.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/Laser.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/DifferentialRobot.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/RCISMousePicker.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/GotoPoint.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/JointMotor.cpp.o
-bin/componente: src/CMakeFiles/componente.dir/AprilTags.cpp.o
+bin/componente: src/CMakeFiles/componente.dir/GetAprilTags.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/componente_automoc.cpp.o
 bin/componente: src/CMakeFiles/componente.dir/build.make
 bin/componente: /usr/lib/x86_64-linux-gnu/libQtOpenGL.so
@@ -616,7 +590,7 @@ bin/componente: /usr/lib/x86_64-linux-gnu/libQtGui.so
 bin/componente: /usr/lib/x86_64-linux-gnu/libQtXml.so
 bin/componente: /usr/lib/x86_64-linux-gnu/libQtCore.so
 bin/componente: src/CMakeFiles/componente.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Linking CXX executable ../bin/componente"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/salabeta/robocomp/components/roboticaDimasAitor/choca/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Linking CXX executable ../bin/componente"
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/componente.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -634,14 +608,13 @@ src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/commonbeha
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/genericworker.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/gotopointI.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/rcismousepickerI.cpp.o.requires
-src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/apriltagsI.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/CommonBehavior.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/Laser.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/DifferentialRobot.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/RCISMousePicker.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/GotoPoint.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/JointMotor.cpp.o.requires
-src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/AprilTags.cpp.o.requires
+src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/GetAprilTags.cpp.o.requires
 src/CMakeFiles/componente.dir/requires: src/CMakeFiles/componente.dir/componente_automoc.cpp.o.requires
 
 .PHONY : src/CMakeFiles/componente.dir/requires
@@ -662,8 +635,8 @@ src/CMakeFiles/componente.dir/depend: src/GotoPoint.cpp
 src/CMakeFiles/componente.dir/depend: src/GotoPoint.h
 src/CMakeFiles/componente.dir/depend: src/JointMotor.cpp
 src/CMakeFiles/componente.dir/depend: src/JointMotor.h
-src/CMakeFiles/componente.dir/depend: src/AprilTags.cpp
-src/CMakeFiles/componente.dir/depend: src/AprilTags.h
+src/CMakeFiles/componente.dir/depend: src/GetAprilTags.cpp
+src/CMakeFiles/componente.dir/depend: src/GetAprilTags.h
 	cd /home/salabeta/robocomp/components/roboticaDimasAitor/choca && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/salabeta/robocomp/components/roboticaDimasAitor/choca /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src /home/salabeta/robocomp/components/roboticaDimasAitor/choca /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src /home/salabeta/robocomp/components/roboticaDimasAitor/choca/src/CMakeFiles/componente.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : src/CMakeFiles/componente.dir/depend
 

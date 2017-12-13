@@ -43,6 +43,26 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 	 * elbow_right = 1,50
 	 * shoulder_right_2 = -1.2
 	 */
+	
+	RoboCompJointMotor::MotorGoalPosition wrist_right, elbow_right, shoulder_right_2;
+	
+	wrist_right.name = "wrist_right_2";
+	wrist_right.position = 1.2;
+	wrist_right.maxSpeed = 1;
+	
+	elbow_right.name = "elbow_right";
+	elbow_right.position = 1.5;
+	elbow_right.maxSpeed = 1;
+	
+	shoulder_right_2.name = "shoulder_right_2";
+	shoulder_right_2.position = -1.2;
+	shoulder_right_2.maxSpeed = 1;
+	
+	
+	jointmotor_proxy->setPosition(wrist_right);
+	jointmotor_proxy->setPosition(elbow_right);
+	jointmotor_proxy->setPosition(shoulder_right_2);
+	
 
 	innermodel = new InnerModel("/home/salabeta/robocomp/files/innermodel/betaWorldArm.xml");
 	timer.start(Period);
@@ -57,6 +77,8 @@ void SpecificWorker::compute()
 	TBaseState robotState;
 	differentialrobot_proxy->getBaseState(robotState);
 	innermodel->updateTransformValues("robot", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
+	
+	getMarcas();
 	
 	switch(receivedState){
 	
@@ -141,7 +163,7 @@ void SpecificWorker::gotoTarget(){
 		dist = targetRobot.norm2();
 		
 		
-		if (dist < 200){
+		if (dist < 200 || onTarget()){
 			stopRobot();
 			return;
 		}
@@ -155,6 +177,11 @@ void SpecificWorker::gotoTarget(){
 		
 
 
+		if (dist < 1000)
+			MAX_ADV = 200;
+		else
+			MAX_ADV = 1000;
+		
 		vRot = atan2(targetRobot.x(), targetRobot.z());
 		if (vRot > MAX_VROT) vRot = MAX_VROT;
 		if (-vRot < -MAX_VROT) vRot = -MAX_VROT;
@@ -363,14 +390,16 @@ bool SpecificWorker::onTarget(){
 		std::pair<float, float> tg = T.extractCoordinates();
 		QVec targetRobot = innermodel->transform("robot",QVec::vec3(tg.first, 0, tg.second) , "world");
 		float dist = targetRobot.norm2();
-		float limit = 700;
+		float limit = 100;
 				
-		if (onBox)
+		if (onBox){
+			onBox = false;
 			return true;
+		}
 			
 		
-		//if (dist < limit)
-		//	return true;
+		if (dist < limit)
+			return true;
 		return false;
 }
 
@@ -465,38 +494,19 @@ void SpecificWorker::catchTheBox(){
 	
 };
 
-void SpecificWorker::newAprilTag(const tagsList &tags)
+void SpecificWorker::getMarcas()
 {
-	for (unsigned int i = 0; i < tags.size(); i++)
-		qDebug()<< "TAG" << tags[i].id;
-	if (tags[0].id > 9){
+	listaMarcas = getapriltags_proxy->checkMarcas();
+	
+	qDebug()<< "MARCAS: " << listaMarcas.size();
+	
+	if (listaMarcas.size()>0){
 		onBox = true;
-		stopRobot();
 	}
-	
-	
-// 	QVec robotInWorld = innermodel->transform("world","robot");
-	
-// 	int tag;
-// 	if (!boxPicked){
-// 		tag = getMinTag(tags, 0);
-// 		if (tag != -1){ //If box found
-// 			QVec targetRobot = innermodel->transform("world",QVec::vec3(tags[tag].tx, 0, tags[tag].tz) , "rgbd");
-// 			T.insertTag(currentBox, targetRobot.x(), targetRobot.z());
-// 		}
-// 
-// 	}
-// 	else{
-// 		tag = getTag(tags, currentTag);
-// 		if ( tag != -1){
-// 				QVec targetRobot = innermodel->transform("world",QVec::vec3(tags[tag].tx, 0, tags[tag].tz) , "rgbd");
-// 				T.insertTag(tags[tag].id, targetRobot.x(), targetRobot.z());
-// 		}
-// 
-// 	}
-	
-
-
-	
 }
+	
+
+
+	
+
 

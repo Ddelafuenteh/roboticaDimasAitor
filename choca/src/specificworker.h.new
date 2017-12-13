@@ -47,7 +47,6 @@ public:
 	bool atTarget();
 	void stop();
 	void setPick(const Pick &myPick);
-	void newAprilTag(const tagsList &tags);
 
 public slots:
 	void compute(); 	

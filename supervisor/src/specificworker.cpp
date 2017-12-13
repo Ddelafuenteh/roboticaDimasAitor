@@ -55,20 +55,12 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 
 void SpecificWorker::compute()
 {
-// 	try
-// 	{
-// 		camera_proxy->getYImage(0,img, cState, bState);
-// 		memcpy(image_gray.data, &img[0], m_width*m_height*sizeof(uchar));
-// 		searchTags(image_gray);
-// 	}
-// 	catch(const Ice::Exception &e)
-// 	{
-// 		std::cout << "Error reading from Camera" << e << std::endl;
-// 	}
 	
 	TBaseState robotState;
 	differentialrobot_proxy->getBaseState(robotState);
 	innermodel->updateTransformValues("robot", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
+	
+	getMarcas();
 	
 	switch(receivedState){
 		
@@ -101,13 +93,14 @@ void SpecificWorker::compute()
 			break;
 		case States::INIT:
 				qDebug()<< "GO TO POINT";
-			
+				
 			try{
 				//WARNING al pasar los null error al ejecutar el go
 				const string nodo;
 				float angle;
 
  				receivedState = States::WAIT;
+				qDebug()<< "GOING TO" << T.tx << " - " << T.tz;
 				gotopoint_proxy->go(nodo, T.tx, T.tz, angle);
 
 			}
@@ -121,37 +114,54 @@ void SpecificWorker::compute()
 
 				if(gotopoint_proxy->atTarget()){
 					//currentTag = (currentTag+1)%4 ;
-					cajasRecogidas.push_back(currentBox);  // despues de apuntar la caja recogida vuelve a punto de partida
-					receivedState = States::RESTART;
+					
+					if (!boxPicked){
+						qDebug()<< "CAJA COGIDA";
+						cajasRecogidas.push_back(currentBox);  // despues de apuntar la caja recogida vuelve a punto de partida
+						boxPicked = true;
+						T.setEmptyTag();
+					
+					}
+					else{
+						boxPicked = false;
+						T.setEmptyTag();
+					}
+					
+					T.setEmptyTag();
  					gotopoint_proxy->stop();
+					
+					receivedState = States::SEARCHBOX;
 				}
 				
 			break;
 		
-		case States::RESTART:
-			qDebug()<< "RESTART";
+		case States::GOHOME:
+			qDebug()<< "GOHOME";
 			
-			const string nodo;
-			float angle = 0.0;
+// 			const string nodo;
+// 			float angle = 0.0;
 
-			T.setEmptyTag();
+		
 			
-			T.insertTag(-1, initRobotX, initRobotZ);
-			qDebug()<< initRobotX;
-			qDebug()<< initRobotZ;
+// 			int id = getTag(currentTag);
+// 			targetRobot = innermodel->transform("world",QVec::vec3(listaMarcas[i].tx, 0, listaMarcas[i].tz) , "rgbd");
+// 			T.insertTag()
+			
+			
+			
 
-			gotopoint_proxy->go(nodo, T.tx, T.tz, angle); // hay que obtener las coordenadas del principio donde esta el robot
-			receivedState = States::FINISH;
+// 			gotopoint_proxy->go(nodo, T.tx, T.tz, angle); // hay que obtener las coordenadas del principio donde esta el robot
+// 			receivedState = States::FINISH;
 			break;
 
 
 	}
 }
 
-int SpecificWorker::getTag(const tagsList tags, int t){
+int SpecificWorker::getTag(int t){
 	
-	for(unsigned int i = 0; i < tags.size(); i++)
-		if (tags[i].id == t)
+	for(unsigned int i = 0; i < listaMarcas.size(); i++)
+		if (listaMarcas[i].id == t)
 			return i;
 		
 	return -1;
@@ -159,28 +169,28 @@ int SpecificWorker::getTag(const tagsList tags, int t){
 }
 
 
-int SpecificWorker::getMinTag(const tagsList tags, int flag){
+int SpecificWorker::getMinTag(int flag){
 	
 	int index = -1;
 	QVec targetRobot;
 	float min_distance = 10000;
 
 	if (flag == 0){ //If looking for a box
-		for(unsigned int i = 0; i < tags.size(); i++){
-			targetRobot = innermodel->transform("world",QVec::vec3(tags[i].tx, 0, tags[i].tz) , "rgbd");
+		for(unsigned int i = 0; i < listaMarcas.size(); i++){
+			targetRobot = innermodel->transform("world",QVec::vec3(listaMarcas[i].tx, 0, listaMarcas[i].tz) , "rgbd");
 
-			if (targetRobot.norm2() < min_distance && tags[i].id > 9 && std::find(cajasRecogidas.begin(), cajasRecogidas.end(), tags[i].id) == cajasRecogidas.end()){
+			if (targetRobot.norm2() < min_distance && listaMarcas[i].id > 9 && std::find(cajasRecogidas.begin(), cajasRecogidas.end(), listaMarcas[i].id) == cajasRecogidas.end()){
 				min_distance = targetRobot.norm2();
 				index = i;
-				currentBox = tags[i].id;
+				currentBox = listaMarcas[i].id;
 			}
 		}
 	}
 	else{ //If looking for a wall tag		
-		for(unsigned int i = 0; i < tags.size(); i++){
-			targetRobot = innermodel->transform("world",QVec::vec3(tags[i].tx, 0, tags[i].tz) , "rgbd");
+		for(unsigned int i = 0; i < listaMarcas.size(); i++){
+			targetRobot = innermodel->transform("world",QVec::vec3(listaMarcas[i].tx, 0, listaMarcas[i].tz) , "rgbd");
 
-			if (targetRobot.norm2() < min_distance && tags[i].id < 9){
+			if (targetRobot.norm2() < min_distance && listaMarcas[i].id < 9){
 				min_distance = targetRobot.norm2();
 				index = i;
 			}
@@ -191,32 +201,35 @@ int SpecificWorker::getMinTag(const tagsList tags, int flag){
 	return index;
 }
 
-void SpecificWorker::newAprilTag(const tagsList &tags)
-{
-// 	QVec robotInWorld = innermodel->transform("world","base");
-	
-	int tag;
-	if (!boxPicked){
-		tag = getMinTag(tags, 0);
-		if (tag != -1){ //If box found
-			QVec targetRobot = innermodel->transform("world",QVec::vec3(tags[tag].tx, 0, tags[tag].tz) , "rgbd");
-			T.insertTag(currentBox, targetRobot.x(), targetRobot.z());
-		}
-
-	}
-	else{
-		tag = getTag(tags, currentTag);
-		if ( tag != -1){
-				QVec targetRobot = innermodel->transform("world",QVec::vec3(tags[tag].tx, 0, tags[tag].tz) , "rgbd");
-				T.insertTag(tags[tag].id, targetRobot.x(), targetRobot.z());
-		}
-
-	}
-	
-
+ void SpecificWorker::getMarcas()
+ {
+ 	QVec robotInWorld = innermodel->transform("world","robot");
+	listaMarcas = getapriltags_proxy->checkMarcas();
 
 	
+ 	int tag;
+ 	if (!boxPicked){
+ 		tag = getMinTag(0);
+ 		if (tag != -1){ //If box found
+ 			QVec targetRobot = innermodel->transform("world",QVec::vec3(listaMarcas[tag].tx, 0, listaMarcas[tag].tz) , "rgbd");
+ 			T.insertTag(currentBox, targetRobot.x(), targetRobot.z());
+ 		}
+ 
+ 	}
+ 	else{
+ 		tag = getTag(currentTag);
+ 		if ( tag != -1){
+ 				QVec targetRobot = innermodel->transform("world",QVec::vec3(listaMarcas[tag].tx, 0, listaMarcas[tag].tz) , "rgbd");
+ 				T.insertTag(listaMarcas[tag].id, targetRobot.x(), targetRobot.z());
+ 		}
+ 
+ 	}
+ 	
+ 
+ 
+ 	
 }
+
 
 
 

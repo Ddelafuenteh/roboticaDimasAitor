@@ -38,7 +38,7 @@ public:
 	~SpecificWorker();
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	void setPick(const Pick &myPick);
-		void newAprilTag(const tagsList &tags);
+// 		void newAprilTag(const tagsList &tags);
 
 
 	void gotoTarget( );
@@ -64,7 +64,8 @@ public:
 	 void stop();
 	//virtual void setPick(const Pick &myPick) = 0;
 	
-	
+	 void getMarcas();
+
 
 	int side; //1 = Derecha, 0 = Izquierda
 	float MAX_ADV = 1000;
@@ -78,6 +79,9 @@ public slots:
 
 private:
 	InnerModel *innermodel;
+	
+
+	
 	float initRobotX;
 	float initRobotZ;
 	
@@ -131,6 +135,8 @@ private:
 	};
 	
 	Target T;
+		RoboCompGetAprilTags::listaMarcas listaMarcas;
+
 	float gaussian(float d);
 	float sinusoidal(float vRot, float Vx, float h);
 	

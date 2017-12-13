@@ -28,14 +28,13 @@ SET ( SOURCES
   specificworker.cpp
   gotopointI.cpp
   rcismousepickerI.cpp
-  apriltagsI.cpp
 )
 
 
 
 #ROBOCOMP
 ROBOCOMP_INITIALIZE( $ENV{ROBOCOMP}/ )
-ROBOCOMP_WRAP_ICE( CommonBehavior Laser DifferentialRobot DifferentialRobot RCISMousePicker GotoPoint JointMotor AprilTags )
+ROBOCOMP_WRAP_ICE( CommonBehavior Laser DifferentialRobot DifferentialRobot RCISMousePicker GotoPoint JointMotor GetAprilTags )
 SET (EXECUTABLE_OUTPUT_PATH ${RC_COMPONENT_DEVEL_PATH}/bin)
 
 # Qt4

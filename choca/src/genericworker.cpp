@@ -25,6 +25,7 @@ QObject()
 {
 	differentialrobot_proxy = (*(DifferentialRobotPrx*)mprx["DifferentialRobotProxy"]);
 	laser_proxy = (*(LaserPrx*)mprx["LaserProxy"]);
+	getapriltags_proxy = (*(GetAprilTagsPrx*)mprx["GetAprilTagsProxy"]);
 	jointmotor_proxy = (*(JointMotorPrx*)mprx["JointMotorProxy"]);
 
 
@@ -61,6 +62,5 @@ void GenericWorker::setPeriod(int p)
 	Period = p;
 	timer.start(Period);
 }
-
 
 
