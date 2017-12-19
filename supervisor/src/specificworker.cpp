@@ -130,7 +130,7 @@ void SpecificWorker::compute()
 					T.setEmptyTag();
  					gotopoint_proxy->stop();
 					
-					receivedState = States::SEARCHBOX;
+					receivedState = States::FINISH;
 				}
 				
 			break;

@@ -63,7 +63,20 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 	jointmotor_proxy->setPosition(elbow_right);
 	jointmotor_proxy->setPosition(shoulder_right_2);
 	
-
+	
+	
+	try { 
+		mList = jointmotor_proxy->getAllMotorParams();}
+	catch(const Ice::Exception &e){
+		std::cout << e << std::endl;
+		
+	}
+	
+	joints << "shoulder_right_1"<<"shoulder_right_2"<<"shoulder_right_3"<<"elbow_right" << "wrist_right_1" << "wrist_right_2";
+	// Check that these names are in mList
+	motores = QVec::zeros(joints.size());
+	
+	//innermodel = InnerModelMgr(std::make_shared<InnerModel>("/home/robocomp/robocomp/files/innermodel/betaWorldArm.xml"));
 	innermodel = new InnerModel("/home/salabeta/robocomp/files/innermodel/betaWorldArm.xml");
 	timer.start(Period);
 
@@ -113,7 +126,20 @@ void SpecificWorker::compute()
 			border();
 			break;	
 			
+			//el vector de errores en este caso solo tendra x e y, z sera 0 para no ajustar verticalmente aun
+			//case para calcular el error con aprilTags y posicion camaraMano -> Cambia el sistema de referencia
+				//si error es menor que x, me paro
+				//si es mayor, llamo al ajustarCamara
+			
+			
 		case States::PICK:
+			
+			//calcular el error SOLO en Z para bajar el brazo (x e y = 0)
+			//hay que ajustar la altura que sube y baja
+			//aqui cerramos la mano cuando la altura se la optima y volvemos a la altura anterior
+			
+			//Entender los valores negativos y positivos al subir y bajar
+			
 			break;
 	}
 	
@@ -487,7 +513,66 @@ void SpecificWorker::stop(){
 	stopRobot();
 };
 
-
+void SpecificWorker::adjustCamera(){
+	
+	RoboCompJointMotor::MotorStateMap mMap;
+	
+	 	try{
+			jointmotor_proxy->getAllMotorState(mMap);
+			for(auto m: mMap){
+				innermodel->updateJointValue(QString::fromStdString(m.first),m.second.pos);
+				//std::cout << m.first << "		" << m.second.pos << std::endl;
+			}
+			std::cout << "--------------------------" << std::endl;
+	}
+	catch(const Ice::Exception &e){
+		std::cout << e.what() << std::endl;
+	}
+	
+	//Compute Jacobian for the chain of joints and using as tip "cameraHand" 
+	QMat jacobian = innermodel->jacobian(joints, motores, "cameraHand");
+	
+	
+	
+	RoboCompJointMotor::MotorGoalVelocityList vl;
+	if(error < 10 ){ //En maquina de estados
+		try{
+			QVec incs = jacobian.invert() * error;	//ERROR1: distancia a alineacion de la camara externamente
+			int i=0;
+			for(auto m: joints){ //Carga las correciones en el vector vl
+				
+				//RoboCompJointMotor::MotorGoalPosition mg = {mMap.find(m.toStdString())->second.pos + incs[i], 1.0, m.toStdString()};
+				RoboCompJointMotor::MotorGoalVelocity vg{FACTOR*incs[i], 1.0, m.toStdString()};
+				//ml.push_back(mg);
+				vl.push_back(vg);
+				i++;
+			}
+		}	
+		catch(const QString &e)
+		{ qDebug() << e << "Error inverting matrix";}
+	}
+	else //Stop the arm en maquina de estados -> nuevo metodo stopArm()
+	{
+		for(auto m: joints)
+		{
+			RoboCompJointMotor::MotorGoalVelocity vg{0.0, 1.0, m.toStdString()};
+			vl.push_back(vg);
+		}
+	}
+	//Do the thing
+	try
+	{ 
+		jointmotor_proxy->setSyncVelocity(vl); //Sincroniza la ejecucion de los motores
+	}
+	catch(const Ice::Exception &e)
+{ std::cout << e.what() << std::endl;}
+	
+	
+	
+	
+	
+	
+};
 
 void SpecificWorker::catchTheBox(){
 
@@ -498,12 +583,14 @@ void SpecificWorker::getMarcas()
 {
 	listaMarcas = getapriltags_proxy->checkMarcas();
 	
-	qDebug()<< "MARCAS: " << listaMarcas.size();
+	//qDebug()<< "MARCAS: " << listaMarcas.size();
 	
 	if (listaMarcas.size()>0){
+		qDebug()<< "CAJA ENCONTRADA";
 		onBox = true;
 	}
-}
+};
+	
 	
 
 

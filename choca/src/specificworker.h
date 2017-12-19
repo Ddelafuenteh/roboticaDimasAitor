@@ -47,6 +47,7 @@ public:
 	void borderinit();
 	void stopRobot();
 	void bug();
+	void adjustCamera();
 	void catchTheBox();
 
 	//CHECK STATE METHODS
@@ -79,8 +80,13 @@ public slots:
 
 private:
 	InnerModel *innermodel;
+// 	InnerModelMgr *innermodel;
 	
-
+	RoboCompJointMotor::MotorParamsList mList;
+	QStringList joints;
+	QVec motores;
+	QVec error; //Error en x y Error en y, comprobar de forma independiente para que sea Verdadero
+	int FACTOR = 1;
 	
 	float initRobotX;
 	float initRobotZ;
@@ -135,7 +141,7 @@ private:
 	};
 	
 	Target T;
-		RoboCompGetAprilTags::listaMarcas listaMarcas;
+	RoboCompGetAprilTags::listaMarcas listaMarcas;
 
 	float gaussian(float d);
 	float sinusoidal(float vRot, float Vx, float h);
