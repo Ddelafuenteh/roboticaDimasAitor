@@ -72,7 +72,6 @@ public:
 	JointMotorPrx jointmotor_proxy;
 	LaserPrx laser_proxy;
 
-
 	virtual void go(const string &nodo, const float x, const float y, const float alpha) = 0;
 	virtual void turn(const float speed) = 0;
 	virtual bool atTarget() = 0;
@@ -83,6 +82,7 @@ public:
 protected:
 	QTimer timer;
 	int Period;
+
 
 public slots:
 	virtual void compute() = 0;

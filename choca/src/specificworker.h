@@ -47,14 +47,19 @@ public:
 	void borderinit();
 	void stopRobot();
 	void bug();
+	void calculateError(int flag);
 	void adjustCamera();
-	void catchTheBox();
+	void stopMotors();
+	void pickbox();
+	void dropbox();
+	
+	
 
 	//CHECK STATE METHODS
 	bool obstacle();
 	bool targetAtSight();
 	bool inAngle();
-	bool isAligned(float X, float Z);
+	bool isAligned(float X, float Z); 
 	bool onTarget();
 // 	bool BoxLocated();
 	
@@ -72,7 +77,7 @@ public:
 	float MAX_ADV = 1000;
  	float MAX_VROT = 0.6;
 	
-	enum States{IDLE, GOTO, ROTATE, BORDERINIT, BORDER, PICK, REALEASING};
+	enum States{IDLE, GOTO, ROTATE, BORDERINIT, BORDER, PICK, ADJUSTINIT, ADJUST, RAISEARM};
 	int receivedState = States::IDLE;
 	
 public slots:
@@ -80,18 +85,20 @@ public slots:
 
 private:
 	InnerModel *innermodel;
-// 	InnerModelMgr *innermodel;
+// 	InnerModelMgr innermodel;
 	
 	RoboCompJointMotor::MotorParamsList mList;
 	QStringList joints;
 	QVec motores;
 	QVec error; //Error en x y Error en y, comprobar de forma independiente para que sea Verdadero
 	int FACTOR = 1;
+	float vDistance;
 	
 	float initRobotX;
 	float initRobotZ;
 	
 	string flag;
+	bool boxPicked = false;
 	bool onBox = false;
 	
 

@@ -64,6 +64,20 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 	jointmotor_proxy->setPosition(shoulder_right_2);
 	
 	
+		RoboCompJointMotor::MotorGoalPosition finger_right_1, finger_right_2;
+	
+	finger_right_1.name = "finger_right_1";
+	finger_right_1.position = 0.0;
+	finger_right_1.maxSpeed = 1;
+	
+	finger_right_2.name = "finger_right_2";
+	finger_right_2.position = 0.0;
+	finger_right_2.maxSpeed = 1;
+	
+	jointmotor_proxy->setPosition(finger_right_1);
+	jointmotor_proxy->setPosition(finger_right_2);
+	
+	
 	
 	try { 
 		mList = jointmotor_proxy->getAllMotorParams();}
@@ -126,19 +140,52 @@ void SpecificWorker::compute()
 			border();
 			break;	
 			
-			//el vector de errores en este caso solo tendra x e y, z sera 0 para no ajustar verticalmente aun
-			//case para calcular el error con aprilTags y posicion camaraMano -> Cambia el sistema de referencia
-				//si error es menor que x, me paro
-				//si es mayor, llamo al ajustarCamara
 			
+		case States::ADJUSTINIT:
+			qDebug()<< "AJUSTAR INIT";
+			calculateError(0);
 			
+			if (abs(error[0]) > 10 || abs(error[1]) > 10){
+				adjustCamera();
+
+			}else{
+				
+				stopMotors();
+				receivedState = States::PICK;
+			}	
+			
+		break;
+		
+		///home/salabeta/robocomp/components/beta-robotica-class/verruga
+
+		
+			//src/verruga.py etc/config 
+
 		case States::PICK:
 			
-			//calcular el error SOLO en Z para bajar el brazo (x e y = 0)
-			//hay que ajustar la altura que sube y baja
-			//aqui cerramos la mano cuando la altura se la optima y volvemos a la altura anterior
+			qDebug()<< "PICK";
+			calculateError(1); //calcular el error SOLO en Z para bajar el brazo (x e y = 0)
+			//hay que ajustar la altura que sube y baja							qDebug()<< "Z: " << listaMarcas[0].tz;
+
+			if (abs(error[2]) > 100){
+				adjustCamera();
+
+			}else{
+				stopMotors();
+				pickbox();
+				receivedState = States::RAISEARM;
+			}
+		
+			break;
 			
-			//Entender los valores negativos y positivos al subir y bajar
+		case States::RAISEARM:
+			qDebug()<< "RAISEARM";
+			error =  QVec::vec6(0, 0, 100, 0, 0, 0);
+			adjustCamera();
+			sleep(3000);
+			stopMotors();
+			
+			
 			
 			break;
 	}
@@ -189,7 +236,7 @@ void SpecificWorker::gotoTarget(){
 		dist = targetRobot.norm2();
 		
 		
-		if (dist < 200 || onTarget()){
+		if (/*dist < 200 ||*/ onTarget()){
 			stopRobot();
 			return;
 		}
@@ -418,14 +465,9 @@ bool SpecificWorker::onTarget(){
 		float dist = targetRobot.norm2();
 		float limit = 100;
 				
-		if (onBox){
-			onBox = false;
+		if (onBox || dist<limit)
 			return true;
-		}
-			
 		
-		if (dist < limit)
-			return true;
 		return false;
 }
 
@@ -484,16 +526,22 @@ void SpecificWorker::stopRobot(){
 void SpecificWorker::go(const string &nodo, const float x, const float y, const float alpha){
 	
 	TBaseState robotState;
-	differentialrobot_proxy->getBaseState(robotState);
 	
-	initRobotX = robotState.x;
-	initRobotZ = robotState.z;
-	
-	flag = nodo;
-	
-	T.insertCoordinates(x, y);
-	differentialrobot_proxy->setSpeedBase(0.0,0.0);
-	receivedState = States::IDLE;
+	if (nodo == "box"){
+		receivedState = States::ADJUSTINIT;
+		
+	}else{
+		differentialrobot_proxy->getBaseState(robotState);
+		
+		initRobotX = robotState.x;
+		initRobotZ = robotState.z;
+		
+		flag = nodo;
+		
+		T.insertCoordinates(x, y);
+		differentialrobot_proxy->setSpeedBase(0.0,0.0);
+		receivedState = States::IDLE;
+	}
 	
 	//gotoTarget(x, y);
 	
@@ -511,6 +559,18 @@ bool SpecificWorker::atTarget(){
 
 void SpecificWorker::stop(){
 	stopRobot();
+};
+
+
+void SpecificWorker::calculateError(int flag){
+	
+	error = QVec::vec6(0, 0, 0, 0, 0, 0);
+	if (listaMarcas.size()>0)
+		if (flag == 0)
+			error = QVec::vec6(-listaMarcas[0].tx, -listaMarcas[0].ty, 0, 0, 0, 0);
+		else
+			error = QVec::vec6(0, 0, -listaMarcas[0].tz, 0, 0, 0);
+	
 };
 
 void SpecificWorker::adjustCamera(){
@@ -533,9 +593,7 @@ void SpecificWorker::adjustCamera(){
 	QMat jacobian = innermodel->jacobian(joints, motores, "cameraHand");
 	
 	
-	
 	RoboCompJointMotor::MotorGoalVelocityList vl;
-	if(error < 10 ){ //En maquina de estados
 		try{
 			QVec incs = jacobian.invert() * error;	//ERROR1: distancia a alineacion de la camara externamente
 			int i=0;
@@ -550,32 +608,72 @@ void SpecificWorker::adjustCamera(){
 		}	
 		catch(const QString &e)
 		{ qDebug() << e << "Error inverting matrix";}
-	}
-	else //Stop the arm en maquina de estados -> nuevo metodo stopArm()
-	{
-		for(auto m: joints)
-		{
-			RoboCompJointMotor::MotorGoalVelocity vg{0.0, 1.0, m.toStdString()};
-			vl.push_back(vg);
+
+		//Do the thing
+		try{ 
+			jointmotor_proxy->setSyncVelocity(vl); //Sincroniza la ejecucion de los motores
 		}
+		catch(const Ice::Exception &e){
+			std::cout << e.what() << std::endl;
+			
+		}
+	
+};
+
+void SpecificWorker::stopMotors(){
+	
+	RoboCompJointMotor::MotorGoalVelocityList vl;
+	for(auto m: joints){
+		RoboCompJointMotor::MotorGoalVelocity vg{0.0, 1.0, m.toStdString()};
+		vl.push_back(vg);
 	}
-	//Do the thing
-	try
-	{ 
+	
+		//Do the thing
+	try{ 
 		jointmotor_proxy->setSyncVelocity(vl); //Sincroniza la ejecucion de los motores
 	}
-	catch(const Ice::Exception &e)
-{ std::cout << e.what() << std::endl;}
-	
-	
-	
-	
+	catch(const Ice::Exception &e){
+		std::cout << e.what() << std::endl;
+	}
 	
 	
 };
 
-void SpecificWorker::catchTheBox(){
+void SpecificWorker::pickbox(){
 
+	RoboCompJointMotor::MotorGoalPosition finger_right_1, finger_right_2;
+	
+	finger_right_1.name = "finger_right_1";
+	finger_right_1.position = -0.6;
+	finger_right_1.maxSpeed = 1;
+	
+	finger_right_2.name = "finger_right_2";
+	finger_right_2.position = 0.6;
+	finger_right_2.maxSpeed = 1;
+	
+	jointmotor_proxy->setPosition(finger_right_1);
+	jointmotor_proxy->setPosition(finger_right_2);
+	
+	boxPicked = true;
+	
+};
+
+
+
+void SpecificWorker::dropbox(){
+
+		RoboCompJointMotor::MotorGoalPosition finger_right_1, finger_right_2;
+	
+	finger_right_1.name = "finger_right_1";
+	finger_right_1.position = 0.6;
+	finger_right_1.maxSpeed = 1;
+	
+	finger_right_2.name = "finger_right_2";
+	finger_right_2.position = -0.6;
+	finger_right_2.maxSpeed = 1;
+	
+	jointmotor_proxy->setPosition(finger_right_1);
+	jointmotor_proxy->setPosition(finger_right_2);
 	
 };
 

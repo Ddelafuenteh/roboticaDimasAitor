@@ -65,7 +65,7 @@ private:
 	bool boxPicked = false;
 	
 
-	enum States{SEARCHBOX, INIT, WAIT,GOHOME, FINISH};
+	enum States{SEARCHBOX, INIT, WAIT, PICKBOX, GOHOME, FINISH};
 	int receivedState = States::SEARCHBOX;
 	
 		struct Tag{

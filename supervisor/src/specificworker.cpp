@@ -67,10 +67,10 @@ void SpecificWorker::compute()
 					
 		case States::FINISH:
 			
-			if(gotopoint_proxy->atTarget()){
- 					gotopoint_proxy->stop();
-					qDebug()<< "ROBOT ARRIVED";
-				}
+// 			if(gotopoint_proxy->atTarget()){
+//  					gotopoint_proxy->stop();
+// 					qDebug()<< "ROBOT ARRIVED";
+// 				}
 			
 			break;
 			
@@ -116,9 +116,9 @@ void SpecificWorker::compute()
 					//currentTag = (currentTag+1)%4 ;
 					
 					if (!boxPicked){
-						qDebug()<< "CAJA COGIDA";
-						cajasRecogidas.push_back(currentBox);  // despues de apuntar la caja recogida vuelve a punto de partida
-						boxPicked = true;
+						receivedState = States::PICKBOX;
+// 						cajasRecogidas.push_back(currentBox);  // despues de apuntar la caja recogida vuelve a punto de partida
+// 						boxPicked = true;
 						T.setEmptyTag();
 					
 					}
@@ -130,13 +130,18 @@ void SpecificWorker::compute()
 					T.setEmptyTag();
  					gotopoint_proxy->stop();
 					
-					receivedState = States::FINISH;
 				}
 				
 			break;
 		
-		case States::GOHOME:
-			qDebug()<< "GOHOME";
+		case States::PICKBOX:
+			qDebug()<< "COGER CAJA";
+			//1 -> pickbox
+			gotopoint_proxy->go("box", 0, 0, 0.0);
+			receivedState = States::FINISH;
+		break;
+
+			
 			
 // 			const string nodo;
 // 			float angle = 0.0;
@@ -152,7 +157,6 @@ void SpecificWorker::compute()
 
 // 			gotopoint_proxy->go(nodo, T.tx, T.tz, angle); // hay que obtener las coordenadas del principio donde esta el robot
 // 			receivedState = States::FINISH;
-			break;
 
 
 	}

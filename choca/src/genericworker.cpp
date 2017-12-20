@@ -36,7 +36,6 @@ QObject()
 	connect(&timer, SIGNAL(timeout()), this, SLOT(compute()));
 
 
-
 // 	timer.start(Period);
 }
 
