@@ -167,12 +167,13 @@ void SpecificWorker::compute()
 			calculateError(1); //calcular el error SOLO en Z para bajar el brazo (x e y = 0)
 			//hay que ajustar la altura que sube y baja							qDebug()<< "Z: " << listaMarcas[0].tz;
 
-			if (abs(error[2]) > 100){
+			if (abs(error[2]) > 80){
 				adjustCamera();
 
 			}else{
 				stopMotors();
 				pickbox();
+				//sleep(1);
 				receivedState = States::RAISEARM;
 			}
 		
@@ -182,7 +183,7 @@ void SpecificWorker::compute()
 			qDebug()<< "RAISEARM";
 			error =  QVec::vec6(0, 0, 100, 0, 0, 0);
 			adjustCamera();
-			sleep(3000);
+			//sleep(1);
 			stopMotors();
 			
 			

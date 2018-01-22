@@ -55,7 +55,8 @@ private:
 	QMutex mutex;
 	InnerModel *innermodel;
 	
-	
+	bool cogida = false;
+
 	float initRobotX, initRobotZ;
 	
 	int currentTag = 0;

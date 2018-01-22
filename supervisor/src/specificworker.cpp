@@ -59,18 +59,20 @@ void SpecificWorker::compute()
 	TBaseState robotState;
 	differentialrobot_proxy->getBaseState(robotState);
 	innermodel->updateTransformValues("robot", robotState.x, 0, robotState.z, 0, robotState.alpha, 0);
-	
 	getMarcas();
 	
 	switch(receivedState){
 		
 					
 		case States::FINISH:
+			qDebug()<<"FINISH";
+			if(!cogida){
+				sleep(5);
+				cogida = true;
+			}
+ 			receivedState = States::SEARCHBOX;
+
 			
-// 			if(gotopoint_proxy->atTarget()){
-//  					gotopoint_proxy->stop();
-// 					qDebug()<< "ROBOT ARRIVED";
-// 				}
 			
 			break;
 			
@@ -118,7 +120,6 @@ void SpecificWorker::compute()
 					if (!boxPicked){
 						receivedState = States::PICKBOX;
 // 						cajasRecogidas.push_back(currentBox);  // despues de apuntar la caja recogida vuelve a punto de partida
-// 						boxPicked = true;
 						T.setEmptyTag();
 					
 					}
@@ -138,6 +139,8 @@ void SpecificWorker::compute()
 			qDebug()<< "COGER CAJA";
 			//1 -> pickbox
 			gotopoint_proxy->go("box", 0, 0, 0.0);
+			boxPicked = true;
+
 			receivedState = States::FINISH;
 		break;
 
